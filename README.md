@@ -1,6 +1,36 @@
 # CS625_S26_Team1
 Real-Time Community Updates
 
+## Project Status
+
+This project currently contains both a backend and a frontend in the same repository.
+
+1. The backend handles MySQL database setup and connectivity.
+2. The frontend is a Next.js application created from a Vercel v0 export.
+3. Full integration between the frontend and backend is still in progress.
+
+## Current Project Structure
+
+```
+CS625_S26_Team1/
+├── backend/
+│   ├── database.py
+│   ├── init.sql
+│   └── requirements.txt
+├── frontend/
+│   ├── app/
+│   ├── components/
+│   ├── hooks/
+│   ├── lib/
+│   ├── public/
+│   ├── styles/
+│   └── package.json
+├── venv/
+├── .gitignore
+├── docker-compose.yml
+└── README.md
+```
+
 ## Database Connectivity Setup
 
 This application uses MySQL 8.0 running in a Docker container. Follow the steps below to set up your database environment.
@@ -52,9 +82,9 @@ python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies and start database
-pip install -r requirements.txt
-docker-compose up -d
-python database.py
+pip install -r backend/requirements.txt
+docker compose up -d
+python backend/database.py
 ```
 
 ### Database Setup Instructions
@@ -185,3 +215,52 @@ docker-compose ps
 **Problem: Slow initial startup**
 - **Expected behavior**: First-time initialization takes 1-2 minutes
 - **Solution**: Wait for "ready for connections" message in logs
+
+### Frontend Setup Instructions
+
+The frontend is a separate Next.js application inside the `frontend` folder.
+
+### Frontend Prerequisites
+
+Make sure you have the following installed:
+
+1. Node.js
+2. npm
+
+You can verify this by using the commands below:
+
+```
+node -v
+npm -v
+```
+
+#### Running the Frontend
+
+From the root of the repository:
+
+```
+cd frontend
+npm install
+npm run dev
+```
+
+This should start the frontend development server, which for time being will be found using the link below:
+
+```
+http://localhost:3000
+```
+
+Your expected output is:
+```
+> my-project@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.3 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://10.0.0.229:3000
+✓ Ready in ___ms
+```
+
+## Running Backend and Frontend Separately
+
+At the moment, the backend and frontend should be started in separate terminals.

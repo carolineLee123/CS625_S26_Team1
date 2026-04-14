@@ -1,8 +1,15 @@
 'use client';
 
+import dynamic from "next/dynamic"
+
+const MapBackground = dynamic(
+  () => import("@/components/map-background").then((mod) => mod.MapBackground),
+  { ssr: false }
+)
+
 import { useState, useCallback, useRef } from 'react';
 import L from 'leaflet';
-import { MapBackground, type MapPin } from '@/components/map-background';
+import { type MapPin } from '@/components/map-background';
 import { TrendingSidebar, type TrendingPost } from '@/components/trending-sidebar';
 import { MapControls } from '@/components/map-controls';
 
@@ -190,7 +197,7 @@ export default function Page() {
       <MapBackground
         pins={mapPins}
         onPinClick={handlePinClick}
-        selectedPinId={activePost}
+        selectedPinId={activePost ?? undefined}
         onMapReady={handleMapReady}
       />
 
