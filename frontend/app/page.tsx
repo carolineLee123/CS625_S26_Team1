@@ -9,6 +9,7 @@ const MapBackground = dynamic(
 
 import { useState, useCallback, useRef } from 'react';
 import L from 'leaflet';
+import { Plus, User } from 'lucide-react';
 import { type MapPin } from '@/components/map-background';
 import { TrendingSidebar, type TrendingPost } from '@/components/trending-sidebar';
 import { MapControls } from '@/components/map-controls';
@@ -215,6 +216,23 @@ export default function Page() {
         onZoomOut={handleZoomOut}
         onCenter={handleCenter}
       />
+
+      {/* Floating (+) create report button */}
+      <button
+        className="absolute bottom-6 right-4 z-30 w-14 h-14 rounded-full bg-blue-500 hover:bg-blue-600 active:scale-95 transition-all duration-150 flex items-center justify-center shadow-lg"
+        aria-label="Create new report"
+      >
+        <Plus size={28} className="text-white" strokeWidth={2.5} />
+      </button>
+
+      {/* User account button (top right) */}
+      <button
+        className="absolute top-4 right-4 z-30 w-10 h-10 rounded-full flex items-center justify-center shadow border border-gray-200 hover:bg-gray-100 active:scale-95 transition-all duration-150"
+        style={{ background: "rgba(255, 255, 255, 0.9)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
+        aria-label="User account"
+      >
+        <User size={20} className="text-gray-700" />
+      </button>
     </main>
   );
 }

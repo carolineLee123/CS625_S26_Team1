@@ -54,14 +54,18 @@ export function MapControls({
 }: MapControlsProps) {
 
   return (
-    <div className="absolute bottom-8 right-5 z-30 flex flex-col items-end gap-3">
-      {/* Zoom controls */}
+    <div className="absolute right-4 top-1/2 -translate-y-1/2 z-30 flex flex-col items-center gap-3">
+      {/* Crosshair + Zoom controls in one pill */}
       <div
-        className="rounded-xl border border-border/50 overflow-hidden flex flex-col"
+        className="rounded-2xl border border-border/50 overflow-hidden flex flex-col divide-y divide-border/40"
         style={glassStyle}
         role="group"
-        aria-label="Zoom controls"
+        aria-label="Map controls"
       >
+        <ControlBtn onClick={onCenter} label="Center map" active>
+          <Crosshair size={18} />
+        </ControlBtn>
+
         <ControlBtn onClick={onZoomIn} label="Zoom in">
           <Plus size={18} />
         </ControlBtn>
@@ -71,33 +75,13 @@ export function MapControls({
         </ControlBtn>
       </div>
 
-      {/* Center / locate + Live button */}
-      <div className="flex flex-col gap-3">
-        <div
-          className="rounded-xl border border-blue-200 overflow-hidden"
-          style={{
-            background: "rgba(59, 130, 246, 0.1)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-          }}
-        >
-          <ControlBtn onClick={onCenter} label="Center map" active>
-            <Crosshair size={18} />
-          </ControlBtn>
-        </div>
-
-        {/* Live indicator */}
-        <div
-          className="rounded-xl border border-gray-200 overflow-hidden flex items-center justify-center h-10 px-3 gap-2"
-          style={{
-            background: "rgba(255, 255, 255, 0.9)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-          }}
-        >
-          <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" aria-hidden="true" />
-          <span className="text-xs text-gray-700 font-medium hidden sm:inline">Live</span>
-        </div>
+      {/* Live indicator */}
+      <div
+        className="rounded-xl border border-gray-200 overflow-hidden flex items-center justify-center h-8 px-3 gap-1.5"
+        style={glassStyle}
+      >
+        <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" aria-hidden="true" />
+        <span className="text-xs text-gray-700 font-medium">Live</span>
       </div>
     </div>
   );
