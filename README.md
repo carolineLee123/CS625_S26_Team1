@@ -216,7 +216,7 @@ docker-compose ps
 - **Expected behavior**: First-time initialization takes 1-2 minutes
 - **Solution**: Wait for "ready for connections" message in logs
 
-### Frontend Setup Instructions
+## Frontend Setup Instructions
 
 The frontend is a separate Next.js application inside the `frontend` folder.
 
