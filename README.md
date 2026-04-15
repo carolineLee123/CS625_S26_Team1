@@ -261,6 +261,85 @@ Your expected output is:
 ✓ Ready in ___ms
 ```
 
-## Running Backend and Frontend Separately
+## Running Backend and Frontend Together
 
-At the moment, the backend and frontend should be started in separate terminals.
+The backend Flask API serves data from the MySQL database, and the frontend fetches this data to display on the map.
+
+### Step 1: Start the Database
+
+Make sure Docker is running and start the MySQL container:
+
+```bash
+docker-compose up -d
+```
+
+Wait for the database to be ready:
+
+```bash
+docker-compose logs -f mysql
+# Wait for "ready for connections" message
+```
+
+### Step 2: Start the Backend API
+
+In one terminal, activate your virtual environment and start the Flask API:
+
+```bash
+# Activate virtual environment
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies (if not already done)
+pip install -r backend/requirements.txt
+
+# Start the Flask API
+cd backend
+python api.py
+```
+
+The API will start on `http://localhost:5000`
+
+Expected output:
+```
+ * Running on http://0.0.0.0:5000
+ * Restarting with stat
+```
+
+### Step 3: Start the Frontend
+
+In another terminal, start the Next.js frontend:
+
+```bash
+cd frontend
+npm install  # If not already done
+npm run dev
+```
+
+The frontend will start on `http://localhost:3000`
+
+### Step 4: View the Application
+
+Open your browser and navigate to `http://localhost:3000`. The map should now display data from your MySQL database.
+
+### API Endpoints
+
+The backend exposes the following endpoints:
+
+- `GET /api/health` - Health check endpoint
+- `GET /api/reports` - Fetch all reports from the database
+- `GET /api/reports/<id>` - Fetch a specific report by ID
+
+### Troubleshooting Integration
+
+**Problem: Map shows fallback data instead of database data**
+- Check that the Flask API is running on port 5000
+- Open browser console to check for API errors
+- Verify the database has data: `python backend/database.py`
+
+**Problem: CORS errors in browser console**
+- Ensure Flask-CORS is installed: `pip install flask-cors`
+- Restart the Flask API server
+
+**Problem: Frontend can't connect to backend**
+- Verify the API URL in `frontend/.env.local` is correct
+- Ensure both servers are running
+- Check that no firewall is blocking port 5000

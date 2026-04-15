@@ -7,14 +7,94 @@ const MapBackground = dynamic(
   { ssr: false }
 )
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import L from 'leaflet';
 import { Plus, User } from 'lucide-react';
 import { type MapPin } from '@/components/map-background';
 import { TrendingSidebar, type TrendingPost } from '@/components/trending-sidebar';
 import { MapControls } from '@/components/map-controls';
+import { fetchReports, type Report } from '@/lib/api';
 
-// Sample posts with map locations
+// Helper functions to convert reports to UI format
+function getSafetyColorFromLevel(safetyLevel: string): string {
+  switch (safetyLevel) {
+    case 'critical':
+      return '#ef4444';
+    case 'high':
+      return '#ef4444';
+    case 'medium':
+      return '#f59e0b';
+    case 'low':
+      return '#14b8a6';
+    default:
+      return '#6b7280';
+  }
+}
+
+function getTagFromSafetyLevel(safetyLevel: string): { tag: string; tagColor: 'urgent' | 'warning' | 'event' | 'note' | 'nonurgent' } {
+  switch (safetyLevel) {
+    case 'critical':
+      return { tag: 'Urgent', tagColor: 'urgent' };
+    case 'high':
+      return { tag: 'Warning', tagColor: 'warning' };
+    case 'medium':
+      return { tag: 'Warning', tagColor: 'warning' };
+    case 'low':
+      return { tag: 'Note', tagColor: 'note' };
+    default:
+      return { tag: 'Non-urgent', tagColor: 'nonurgent' };
+  }
+}
+
+function getTimeAgo(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 60) return `${diffMins}m`;
+  if (diffHours < 24) return `${diffHours}h`;
+  return `${diffDays}d`;
+}
+
+function convertReportToPost(report: Report, rank: number): TrendingPost {
+  const { tag, tagColor } = getTagFromSafetyLevel(report.safety_level);
+  const initials = report.username.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+
+  return {
+    id: report.id,
+    rank,
+    username: report.description.split('.')[0] || 'Report',
+    handle: report.username,
+    avatar: initials,
+    content: report.description,
+    location: `${report.latitude.toFixed(4)}, ${report.longitude.toFixed(4)}`,
+    likes: 0,
+    comments: 0,
+    shares: 0,
+    tag,
+    tagColor,
+    timeAgo: getTimeAgo(report.created_at),
+  };
+}
+
+function convertReportToPin(report: Report): MapPin {
+  return {
+    id: String(report.id),
+    lat: report.latitude,
+    lng: report.longitude,
+    title: report.description.split('.')[0] || 'Report',
+    color: getSafetyColorFromLevel(report.safety_level),
+    number: report.id,
+    description: report.description,
+    category: report.category,
+    safetyLevel: report.safety_level,
+  };
+}
+
+// Sample posts with map locations (fallback data)
 const POSTS: TrendingPost[] = [
   {
     id: 1,
@@ -164,6 +244,40 @@ export default function Page() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activePost, setActivePost] = useState<string | null>('1');
   const mapRef = useRef<L.Map | null>(null);
+  const [posts, setPosts] = useState<TrendingPost[]>(POSTS);
+  const [pins, setPins] = useState<MapPin[]>(mapPins);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadReports() {
+      console.log('Starting to load reports from API...');
+      setLoading(true);
+      const reports = await fetchReports();
+      console.log('Fetched reports:', reports);
+      console.log('Number of reports:', reports.length);
+
+      if (reports.length > 0) {
+        const convertedPosts = reports.map((report, index) => convertReportToPost(report, index + 1));
+        const convertedPins = reports.map(report => convertReportToPin(report));
+
+        console.log('Converted pins:', convertedPins);
+        setPosts(convertedPosts);
+        setPins(convertedPins);
+
+        if (convertedPosts.length > 0) {
+          setActivePost(String(convertedPosts[0].id));
+        }
+      } else {
+        console.log('No reports found, using fallback data');
+        setPosts(POSTS);
+        setPins(mapPins);
+      }
+
+      setLoading(false);
+    }
+
+    loadReports();
+  }, []);
 
   const handlePostClick = useCallback((id: number) => {
     setActivePost(String(id));
@@ -186,7 +300,7 @@ export default function Page() {
   }, []);
 
   const handleCenter = useCallback(() => {
-    if (mapRef.current) mapRef.current.setView([42.3737, -72.5224], 14);
+    if (mapRef.current) mapRef.current.setView([42.3601, -71.0589], 13);
   }, []);
 
   return (
@@ -196,7 +310,7 @@ export default function Page() {
     >
       {/* Map layer */}
       <MapBackground
-        pins={mapPins}
+        pins={pins}
         onPinClick={handlePinClick}
         selectedPinId={activePost ?? undefined}
         onMapReady={handleMapReady}
@@ -208,6 +322,7 @@ export default function Page() {
         onClose={() => setSidebarOpen(false)}
         activePost={activePost ? parseInt(activePost) : null}
         onPostClick={handlePostClick}
+        posts={posts}
       />
 
       {/* Map controls (bottom right) */}
