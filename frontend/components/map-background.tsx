@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import "leaflet/dist/leaflet.css"
 
 export interface MapPin {
@@ -10,6 +10,9 @@ export interface MapPin {
   color: string
   number: number
   title: string
+  description?: string
+  category?: string
+  safetyLevel?: string
 }
 
 interface MapBackgroundProps {
@@ -28,6 +31,7 @@ export function MapBackground({
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<any>(null)
   const markersRef = useRef<{ [key: string]: any }>({})
+  const [mapReady, setMapReady] = useState(false)
 
   useEffect(() => {
     let isMounted = true
@@ -38,7 +42,7 @@ export function MapBackground({
       const L = (await import("leaflet")).default
       if (!isMounted || !mapContainer.current) return
 
-      map.current = L.map(mapContainer.current).setView([39.8283, -98.5795], 4)
+      map.current = L.map(mapContainer.current).setView([42.3601, -71.0589], 13)
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
@@ -56,6 +60,8 @@ export function MapBackground({
           "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
       })
 
+      console.log('MapBackground: Map initialized, setting mapReady to true');
+      setMapReady(true);
       onMapReady?.(map.current)
     }
 
@@ -72,7 +78,11 @@ export function MapBackground({
 
   useEffect(() => {
     const updatePins = async () => {
-      if (!map.current) return
+      console.log('MapBackground: updatePins called with', pins.length, 'pins', 'mapReady:', mapReady);
+      if (!map.current || !mapReady) {
+        console.log('MapBackground: map not ready yet, skipping pin update');
+        return;
+      }
 
       const L = (await import("leaflet")).default
 
@@ -81,7 +91,9 @@ export function MapBackground({
       })
       markersRef.current = {}
 
+      console.log('MapBackground: Adding pins to map:', pins);
       pins.forEach((pin) => {
+        console.log('Adding pin:', pin.id, 'at', pin.lat, pin.lng);
         const html = `
           <div style="
             width: 40px;
@@ -116,12 +128,36 @@ export function MapBackground({
             onPinClick?.(pin.id)
           })
 
+        // Add tooltip with report information
+        if (pin.description || pin.category || pin.safetyLevel) {
+          const tooltipContent = `
+            <div style="font-family: system-ui, -apple-system, sans-serif;">
+              <strong style="display: block; margin-bottom: 4px; font-size: 13px;">${pin.title}</strong>
+              ${pin.description ? `<p style="margin: 0 0 4px 0; font-size: 12px; color: #555;">${pin.description.substring(0, 100)}${pin.description.length > 100 ? '...' : ''}</p>` : ''}
+              ${pin.category ? `<span style="display: inline-block; background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-size: 11px; margin-right: 4px;">${pin.category}</span>` : ''}
+              ${pin.safetyLevel ? `<span style="display: inline-block; background: ${pin.color}; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">${pin.safetyLevel}</span>` : ''}
+            </div>
+          `
+
+          marker.bindTooltip(tooltipContent, {
+            direction: 'top',
+            offset: [0, -20],
+            opacity: 0.95,
+            className: 'custom-tooltip'
+          })
+        } else {
+          marker.bindTooltip(pin.title, {
+            direction: 'top',
+            offset: [0, -20],
+          })
+        }
+
         markersRef.current[pin.id] = marker
       })
     }
 
     updatePins()
-  }, [pins, onPinClick])
+  }, [pins, onPinClick, mapReady])
 
   useEffect(() => {
     Object.entries(markersRef.current).forEach(([pinId]) => {

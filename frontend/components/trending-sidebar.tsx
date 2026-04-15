@@ -156,6 +156,7 @@ interface TrendingSidebarProps {
   onClose: () => void;
   activePost: number | null;
   onPostClick: (id: number) => void;
+  posts?: TrendingPost[];
 }
 
 const SUGGESTIONS = [
@@ -167,12 +168,12 @@ const SUGGESTIONS = [
   { type: "recent", label: "Portland, OR", sublabel: "Searched recently" },
 ];
 
-export function TrendingSidebar({ open, onClose, activePost, onPostClick }: TrendingSidebarProps) {
+export function TrendingSidebar({ open, onClose, activePost, onPostClick, posts = POSTS }: TrendingSidebarProps) {
   const [view, setView] = useState<"list" | "compact">("list");
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
 
-  const filtered = POSTS;
+  const filtered = posts;
 
   const suggestions = query
     ? SUGGESTIONS.filter((s) =>

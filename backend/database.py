@@ -93,6 +93,68 @@ class DatabaseManager:
             print(f"[ERROR] Error fetching reports: {e}")
             return []
 
+    def get_all_reports(self):
+        """Retrieve all reports from the database"""
+        if not self.connection or not self.connection.is_connected():
+            if not self.connect():
+                return []
+
+        try:
+            cursor = self.connection.cursor(dictionary=True)
+            query = """
+            SELECT r.id, r.latitude, r.longitude, r.description,
+                   r.category, r.safety_level, r.status, r.created_at,
+                   r.updated_at, u.username
+            FROM reports r
+            JOIN users u ON r.user_id = u.id
+            ORDER BY r.created_at DESC
+            """
+            cursor.execute(query)
+            reports = cursor.fetchall()
+            cursor.close()
+
+            for report in reports:
+                report['latitude'] = float(report['latitude'])
+                report['longitude'] = float(report['longitude'])
+                report['created_at'] = report['created_at'].isoformat() if report['created_at'] else None
+                report['updated_at'] = report['updated_at'].isoformat() if report['updated_at'] else None
+
+            return reports
+        except Error as e:
+            print(f"[ERROR] Error fetching reports: {e}")
+            return []
+
+    def get_report_by_id(self, report_id):
+        """Retrieve a specific report by ID"""
+        if not self.connection or not self.connection.is_connected():
+            if not self.connect():
+                return None
+
+        try:
+            cursor = self.connection.cursor(dictionary=True)
+            query = """
+            SELECT r.id, r.latitude, r.longitude, r.description,
+                   r.category, r.safety_level, r.status, r.created_at,
+                   r.updated_at, u.username
+            FROM reports r
+            JOIN users u ON r.user_id = u.id
+            WHERE r.id = %s
+            """
+            cursor.execute(query, (report_id,))
+            report = cursor.fetchone()
+            cursor.close()
+
+            if report:
+                report['latitude'] = float(report['latitude'])
+                report['longitude'] = float(report['longitude'])
+                report['created_at'] = report['created_at'].isoformat() if report['created_at'] else None
+                report['updated_at'] = report['updated_at'].isoformat() if report['updated_at'] else None
+
+            return report
+        except Error as e:
+            print(f"[ERROR] Error fetching report: {e}")
+            return None
+
     def add_sample_report(self, user_id, lat, lng, description, category, safety_level):
         """Add a new report for testing"""
         if not self.connection or not self.connection.is_connected():

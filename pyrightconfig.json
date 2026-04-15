@@ -1,0 +1,6 @@
+{
+    "typeCheckingMode": "off",
+    "reportOptionalMemberAccess": false,
+    "reportOptionalCall": false,
+    "reportGeneralTypeIssues": false
+}

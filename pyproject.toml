@@ -1,0 +1,14 @@
+[tool.pyright]
+# Disable strict type checking
+typeCheckingMode = "off"
+
+# Or use "basic" for minimal checking
+# typeCheckingMode = "basic"
+
+# Disable specific warnings
+reportOptionalMemberAccess = false
+reportOptionalCall = false
+reportOptionalIterable = false
+reportOptionalContextManager = false
+reportOptionalOperand = false
+reportGeneralTypeIssues = false

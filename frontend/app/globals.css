@@ -116,3 +116,17 @@
     @apply bg-background text-foreground;
   }
 }
+
+.leaflet-tooltip.custom-tooltip {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: system-ui, -apple-system, sans-serif;
+  max-width: 250px;
+}
+
+.leaflet-tooltip.custom-tooltip::before {
+  border-top-color: white;
+}
