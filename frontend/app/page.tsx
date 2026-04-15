@@ -14,6 +14,7 @@ import { type MapPin } from '@/components/map-background';
 import { TrendingSidebar, type TrendingPost } from '@/components/trending-sidebar';
 import { MapControls } from '@/components/map-controls';
 import { fetchReports, type Report } from '@/lib/api';
+import { CreateReportModal } from '@/components/create-report-modal';
 
 // Helper functions to convert reports to UI format
 function getSafetyColorFromLevel(safetyLevel: string): string {
@@ -243,6 +244,7 @@ const mapPins: MapPin[] = [
 export default function Page() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activePost, setActivePost] = useState<string | null>('1');
+  const [createOpen, setCreateOpen] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
   const [posts, setPosts] = useState<TrendingPost[]>(POSTS);
   const [pins, setPins] = useState<MapPin[]>(mapPins);
@@ -334,11 +336,15 @@ export default function Page() {
 
       {/* Floating (+) create report button */}
       <button
+        onClick={() => setCreateOpen(true)}
         className="absolute bottom-6 right-4 z-30 w-14 h-14 rounded-full bg-blue-500 hover:bg-blue-600 active:scale-95 transition-all duration-150 flex items-center justify-center shadow-lg"
         aria-label="Create new report"
       >
         <Plus size={28} className="text-white" strokeWidth={2.5} />
       </button>
+
+      {/* Create report modal */}
+      <CreateReportModal open={createOpen} onClose={() => setCreateOpen(false)} />
 
       {/* User account button (top right) */}
       <button
