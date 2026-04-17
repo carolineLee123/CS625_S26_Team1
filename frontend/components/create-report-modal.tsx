@@ -15,15 +15,15 @@ type Urgency = 'Non-urgent' | 'Warning' | 'Urgent';
 type Step = 'form' | 'preview' | 'confirmed';
 
 const CATEGORIES: { label: Category; color: string; active: string }[] = [
-  { label: 'Safety', color: 'tag-outline-safety',    active: 'tag-safety' },
-  { label: 'Event',  color: 'tag-outline-event',     active: 'tag-event' },
-  { label: 'Note',   color: 'tag-outline-note',      active: 'tag-note' },
+  { label: 'Safety', color: 'tag-outline-safety',    active: 'tag-solid-safety' },
+  { label: 'Event',  color: 'tag-outline-event',     active: 'tag-solid-event' },
+  { label: 'Note',   color: 'tag-outline-note',      active: 'tag-solid-note' },
 ];
 
 const URGENCY_LEVELS: { label: Urgency; color: string; active: string }[] = [
-  { label: 'Non-urgent', color: 'tag-outline-nonurgent', active: 'tag-nonurgent' },
-  { label: 'Warning',    color: 'tag-outline-warning',   active: 'tag-warning' },
-  { label: 'Urgent',     color: 'tag-outline-urgent',    active: 'tag-urgent' },
+  { label: 'Non-urgent', color: 'tag-outline-nonurgent', active: 'tag-solid-nonurgent' },
+  { label: 'Warning',    color: 'tag-outline-warning',   active: 'tag-solid-warning' },
+  { label: 'Urgent',     color: 'tag-outline-urgent',    active: 'tag-solid-urgent' },
 ];
 
 const TAG_COLORS = {
