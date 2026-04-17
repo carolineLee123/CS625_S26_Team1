@@ -13,7 +13,6 @@ export interface MapPin {
   description?: string
   category?: string
   safetyLevel?: string
-  urgency?: string
   location?: string
   status?: string
   createdAt?: string
@@ -136,8 +135,12 @@ export function MapBackground({
         if (pin.description || pin.category || pin.safetyLevel) {
           isRich = true
 
-          const urgencyClass = pin.urgency === 'Urgent' ? 'tag-urgent'
-            : pin.urgency === 'Warning' ? 'tag-warning'
+          const urgencyLabel = (pin.safetyLevel === 'critical' || pin.safetyLevel === 'high') ? 'Urgent'
+            : pin.safetyLevel === 'medium' ? 'Warning'
+            : pin.safetyLevel === 'low' ? 'Note'
+            : null
+          const urgencyClass = urgencyLabel === 'Urgent' ? 'tag-urgent'
+            : urgencyLabel === 'Warning' ? 'tag-warning'
             : 'tag-nonurgent'
 
           const categoryClassMap: Record<string, string> = {
@@ -181,7 +184,7 @@ export function MapBackground({
             <div class="tp-card">
               <h3 class="tp-title">${pin.title}</h3>
               <div class="tp-tags">
-                ${pin.urgency ? `<span class="tp-tag ${urgencyClass}">${pin.urgency}</span>` : ''}
+                ${urgencyLabel ? `<span class="tp-tag ${urgencyClass}">${urgencyLabel}</span>` : ''}
                 ${categoryLabel ? `<span class="tp-tag ${catClass}">${categoryLabel}</span>` : ''}
               </div>
               ${pin.location ? `<div class="tp-location">${pin.location}</div>` : ''}

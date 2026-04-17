@@ -83,7 +83,6 @@ function convertReportToPost(report: Report, rank: number): TrendingPost {
 }
 
 function convertReportToPin(report: Report): MapPin {
-  const { tag } = getTagFromSafetyLevel(report.safety_level);
   return {
     id: String(report.id),
     lat: report.latitude,
@@ -94,7 +93,6 @@ function convertReportToPin(report: Report): MapPin {
     description: report.description,
     category: report.category,
     safetyLevel: report.safety_level,
-    urgency: tag,
     location: `${report.latitude.toFixed(4)}, ${report.longitude.toFixed(4)}`,
     status: report.status,
     createdAt: report.created_at,
@@ -208,7 +206,7 @@ const mapPins: MapPin[] = [
     description: 'Active Winter Weather Warning for winter blizzard storm in the Amherst Area. Expected Temps 20-25 tonight.',
     category: 'safety',
     safetyLevel: 'critical',
-    urgency: 'Urgent',
+
     location: 'Amherst, MA',
     status: 'open',
     createdAt: new Date().toISOString(),
@@ -224,7 +222,7 @@ const mapPins: MapPin[] = [
     description: 'On the 2nd floor of the Men\'s restroom, there\'s some water I noticed. The people at the desk said they are aware.',
     category: 'safety',
     safetyLevel: 'medium',
-    urgency: 'Warning',
+
     location: 'John W. Lodges Graduate Research Center',
     status: 'in_progress',
     createdAt: new Date().toISOString(),
@@ -240,7 +238,7 @@ const mapPins: MapPin[] = [
     description: 'A collaboration between UMass Permaculture and the UMass Student Farmers Market. Fresh seasonal produce available.',
     category: 'event',
     safetyLevel: 'low',
-    urgency: 'Non-urgent',
+
     location: 'Student Union · 41 Campus Center Way',
     status: 'closed',
     createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
@@ -256,7 +254,7 @@ const mapPins: MapPin[] = [
     description: 'Scheduled maintenance on building systems. Campus security is monitoring the area.',
     category: 'safety',
     safetyLevel: 'low',
-    urgency: 'Non-urgent',
+
     location: 'Central Campus, MA',
     status: 'open',
     createdAt: new Date().toISOString(),
@@ -272,7 +270,7 @@ const mapPins: MapPin[] = [
     description: 'Community gathering in the central plaza this weekend. Open to all students and staff.',
     category: 'event',
     safetyLevel: 'low',
-    urgency: 'Non-urgent',
+
     location: 'Downtown Amherst, MA',
     status: 'open',
     createdAt: new Date().toISOString(),
@@ -288,7 +286,7 @@ const mapPins: MapPin[] = [
     description: 'Fresh seasonal produce available this week. Support local farming and community.',
     category: 'event',
     safetyLevel: 'low',
-    urgency: 'Non-urgent',
+
     location: 'Market Square, MA',
     status: 'open',
     createdAt: new Date().toISOString(),
