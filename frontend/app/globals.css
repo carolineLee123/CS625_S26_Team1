@@ -189,7 +189,9 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   transition: all 0.2s;
+  position: relative;
 }
+
 
 /* ── Pin tooltip card ─────────────────────────────────────────────────────── */
 .tp-card        { font-family: system-ui, -apple-system, sans-serif; width: 260px; }
@@ -201,6 +203,12 @@
 .tp-verified    { display: flex; align-items: center; gap: 4px; margin-bottom: 3px; font-size: 12px; color: #2563eb; }
 .tp-desc        { margin: 0 0 8px 0; font-size: 12px; color: #444; line-height: 1.45; margin-bottom: 3px;}
 .tp-cta         { text-align: center; background: #3b82f6; color: white; border-radius: 8px; padding: 6px 0; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+.leaflet-tooltip.tp-hidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
 
 .leaflet-tooltip.custom-tooltip,
 .leaflet-tooltip.custom-tooltip * {

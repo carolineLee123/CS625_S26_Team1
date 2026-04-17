@@ -25,24 +25,28 @@ interface ViewReportModalProps {
     likes: number;
     comments: number;
     shares: number;
-    tagColor: 'urgent' | 'warning' | 'event' | 'note' | 'nonurgent';
+    tagColor: 'urgent' | 'warning' | 'event' | 'note' | 'nonurgent' | 'safety' | 'weather';
   } | null;
 }
 
-const TAG_COLORS = {
-  urgent:    'bg-red-100 text-red-700 border-red-200',
-  warning:   'bg-orange-100 text-orange-700 border-orange-200',
-  nonurgent: 'bg-gray-100 text-gray-700 border-gray-200',
-  event:     'bg-teal-100 text-teal-700 border-teal-200',
-  note:      'bg-purple-100 text-purple-700 border-purple-200',
+const TAG_COLORS: Record<string, string> = {
+  urgent:    'tag-urgent',
+  warning:   'tag-warning',
+  nonurgent: 'tag-nonurgent',
+  event:     'tag-event',
+  note:      'tag-note',
+  safety:    'tag-safety',
+  weather:   'tag-weather',
 };
 
-const AVATAR_COLORS = {
-  urgent:    'bg-red-100 text-red-700 border border-red-300',
-  warning:   'bg-orange-100 text-orange-700 border border-orange-300',
-  nonurgent: 'bg-gray-100 text-gray-700 border border-gray-300',
-  event:     'bg-teal-100 text-teal-700 border border-teal-300',
-  note:      'bg-purple-100 text-purple-700 border border-purple-300',
+const AVATAR_COLORS: Record<string, string> = {
+  urgent:    'tag-urgent',
+  warning:   'tag-warning',
+  nonurgent: 'tag-nonurgent',
+  event:     'tag-event',
+  note:      'tag-note',
+  safety:    'tag-safety',
+  weather:   'tag-weather',
 };
 
 export function ViewReportModal({ open, onClose, report }: ViewReportModalProps) {

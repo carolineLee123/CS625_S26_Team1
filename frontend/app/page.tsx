@@ -351,18 +351,11 @@ export default function Page() {
       });
     }
 
-    // Find the post and open the view modal
-    const post = posts.find(p => p.id === id);
-    if (post) {
-      setSelectedReport(post);
-      setViewReportOpen(true);
-    }
   }, [pins, posts]);
 
   const handlePinClick = useCallback((pinId: string) => {
     setActivePost(pinId);
 
-    // Center map on the clicked pin
     const pin = pins.find(p => p.id === pinId);
     if (pin && mapRef.current) {
       mapRef.current.setView([pin.lat, pin.lng], 16, {
@@ -371,13 +364,20 @@ export default function Page() {
       });
     }
 
-    // Find the post and open the view modal
-    const post = posts.find(p => p.id === parseInt(pinId));
+    const post = posts.find(p => String(p.id) === pinId);
     if (post) {
       setSelectedReport(post);
       setViewReportOpen(true);
     }
   }, [pins, posts]);
+
+  const handleReadMore = useCallback((pinId: string) => {
+    const post = posts.find(p => p.id === parseInt(pinId));
+    if (post) {
+      setSelectedReport(post);
+      setViewReportOpen(true);
+    }
+  }, [posts]);
 
   const handleMapReady = useCallback((map: L.Map) => {
     mapRef.current = map;
@@ -414,6 +414,7 @@ export default function Page() {
       <MapBackground
         pins={pins}
         onPinClick={handlePinClick}
+        onReadMore={handleReadMore}
         selectedPinId={activePost ?? undefined}
         onMapReady={handleMapReady}
         onMapClick={handleMapClick}
