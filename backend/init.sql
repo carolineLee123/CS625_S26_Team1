@@ -39,9 +39,3 @@ INSERT INTO users (username, email) VALUES
 ('admin', 'admin@example.com')
 ON DUPLICATE KEY UPDATE username=username;
 
--- Insert sample reports
-INSERT INTO reports (user_id, latitude, longitude, description, category, safety_level) VALUES
-(1, 37.7749, -122.4194, 'Pothole on main street causing traffic issues', 'note', 'medium'),
-(1, 37.7849, -122.4094, 'Broken streetlight in park area', 'safety', 'high'),
-(2, 37.7649, -122.4294, 'Fallen tree blocking sidewalk after storm', 'safety', 'high')
-ON DUPLICATE KEY UPDATE description=description;

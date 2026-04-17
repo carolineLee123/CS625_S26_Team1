@@ -115,7 +115,7 @@ export function MapBackground({
       pins.forEach((pin) => {
         const html = `
           <div class="map-pin map-pin-${pin.id}" style="background:${pin.color};">
-            ${pin.number}
+            !
           </div>
         `
 
