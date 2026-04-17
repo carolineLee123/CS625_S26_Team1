@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from database import DatabaseManager
 import os
@@ -58,6 +58,80 @@ def get_report(report_id):
                 'success': False,
                 'error': 'Report not found'
             }), 404
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/reports', methods=['POST'])
+def create_report():
+    """Create a new report"""
+    try:
+        if not db.connection or not db.connection.is_connected():
+            db.connect()
+
+        data = request.get_json()
+
+        # Validate required fields
+        required_fields = ['title', 'location', 'category', 'description']
+        for field in required_fields:
+            if field not in data or not data[field]:
+                return jsonify({
+                    'success': False,
+                    'error': f'Missing required field: {field}'
+                }), 400
+
+        # Map frontend category to backend category
+        category_map = {
+            'Safety': 'safety',
+            'Event': 'infrastructure',
+            'Note': 'other'
+        }
+        category = category_map.get(data['category'], 'other')
+
+        # Map frontend urgency to backend safety_level
+        urgency_map = {
+            'Urgent': 'critical',
+            'Warning': 'high',
+            'Non-urgent': 'low'
+        }
+        safety_level = urgency_map.get(data.get('urgency', 'Non-urgent'), 'low')
+
+        # For events and notes, default to low safety level
+        if data['category'] in ['Event', 'Note']:
+            safety_level = 'low'
+
+        # Default user_id to 1 for now (in production, use authenticated user)
+        user_id = data.get('user_id', 1)
+
+        # Get latitude and longitude (default to Boston if not provided)
+        latitude = data.get('latitude', 42.3601)
+        longitude = data.get('longitude', -71.0589)
+
+        # Create the report
+        report = db.create_report(
+            user_id=user_id,
+            latitude=latitude,
+            longitude=longitude,
+            title=data['title'],
+            description=data['description'],
+            category=category,
+            safety_level=safety_level,
+            location_text=data['location']
+        )
+
+        if report:
+            return jsonify({
+                'success': True,
+                'data': report
+            }), 201
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to create report'
+            }), 500
+
     except Exception as e:
         return jsonify({
             'success': False,

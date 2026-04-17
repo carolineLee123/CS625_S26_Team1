@@ -20,6 +20,7 @@ interface MapBackgroundProps {
   onPinClick?: (pinId: string) => void
   selectedPinId?: string
   onMapReady?: (map: any) => void
+  onMapClick?: (lat: number, lng: number) => void
 }
 
 export function MapBackground({
@@ -27,6 +28,7 @@ export function MapBackground({
   onPinClick,
   selectedPinId,
   onMapReady,
+  onMapClick,
 }: MapBackgroundProps) {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<any>(null)
@@ -49,6 +51,13 @@ export function MapBackground({
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
       }).addTo(map.current)
+
+      // Add click handler to map
+      if (onMapClick) {
+        map.current.on('click', (e: any) => {
+          onMapClick(e.latlng.lat, e.latlng.lng)
+        })
+      }
 
       delete (L.Icon.Default.prototype as any)._getIconUrl
       L.Icon.Default.mergeOptions({
@@ -74,7 +83,7 @@ export function MapBackground({
         map.current = null
       }
     }
-  }, [onMapReady])
+  }, [onMapReady, onMapClick])
 
   useEffect(() => {
     const updatePins = async () => {
