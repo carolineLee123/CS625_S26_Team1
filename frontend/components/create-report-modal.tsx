@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, ImagePlus, Navigation, CheckCircle2, Hash, Heart, MessageCircle, Share2, Calendar, User, BadgeCheck } from 'lucide-react';
 import {
   Dialog,
@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { createReport } from '@/lib/api';
 
 type Category = 'Safety' | 'Event' | 'Note';
 type Urgency = 'Non-urgent' | 'Warning' | 'Urgent';
@@ -70,9 +71,13 @@ function getTagLabel(category: Category | null, urgency: Urgency | null) {
 interface CreateReportModalProps {
   open: boolean;
   onClose: () => void;
+  onReportCreated?: () => void;
+  initialLatitude?: number;
+  initialLongitude?: number;
+  initialLocation?: string;
 }
 
-export function CreateReportModal({ open, onClose }: CreateReportModalProps) {
+export function CreateReportModal({ open, onClose, onReportCreated, initialLatitude, initialLongitude, initialLocation }: CreateReportModalProps) {
   const [step, setStep] = useState<Step>('form');
   const [title, setTitle] = useState('');
   const [location, setLocation] = useState('');
@@ -80,6 +85,9 @@ export function CreateReportModal({ open, onClose }: CreateReportModalProps) {
   const [description, setDescription] = useState('');
   const [urgency, setUrgency] = useState<Urgency | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [clickedLat, setClickedLat] = useState<number | undefined>(initialLatitude);
+  const [clickedLng, setClickedLng] = useState<number | undefined>(initialLongitude);
 
   function handleClose() {
     onClose();
@@ -216,6 +224,11 @@ export function CreateReportModal({ open, onClose }: CreateReportModalProps) {
               {location === 'Current Location' && (
                 <span className="flex items-center gap-1 text-xs text-blue-500 mt-0.5">
                   <MapPin size={11} /> Using your current location
+                </span>
+              )}
+              {clickedLat && clickedLng && location !== 'Current Location' && (
+                <span className="flex items-center gap-1 text-xs text-green-600 mt-0.5">
+                  <MapPin size={11} /> Location from map click: {clickedLat.toFixed(4)}, {clickedLng.toFixed(4)}
                 </span>
               )}
             </div>
@@ -432,10 +445,16 @@ export function CreateReportModal({ open, onClose }: CreateReportModalProps) {
             </button>
             <button
               type="button"
-              onClick={() => setStep('confirmed')}
-              className="rounded-lg px-5 py-2 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 active:scale-95 transition-all"
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className={cn(
+                "rounded-lg px-5 py-2 text-sm font-semibold transition-all",
+                isSubmitting
+                  ? "bg-gray-400 text-white cursor-not-allowed"
+                  : "bg-blue-500 text-white hover:bg-blue-600 active:scale-95"
+              )}
             >
-              Submit Report
+              {isSubmitting ? 'Submitting...' : 'Submit Report'}
             </button>
           </div>
         </DialogContent>

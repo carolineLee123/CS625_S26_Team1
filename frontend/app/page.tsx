@@ -133,35 +133,8 @@ export default function Page() {
   }, []);
 
   useEffect(() => {
-    async function loadReports() {
-      console.log('Starting to load reports from API...');
-      setLoading(true);
-      const reports = await fetchReports();
-      console.log('Fetched reports:', reports);
-      console.log('Number of reports:', reports.length);
-
-      if (reports.length > 0) {
-        const convertedPosts = reports.map((report, index) => convertReportToPost(report, index + 1));
-        const convertedPins = reports.map(report => convertReportToPin(report));
-
-        console.log('Converted pins:', convertedPins);
-        setPosts(convertedPosts);
-        setPins(convertedPins);
-
-        if (convertedPosts.length > 0) {
-          setActivePost(String(convertedPosts[0].id));
-        }
-      } else {
-        console.log('No reports found, using fallback data');
-        setPosts(POSTS);
-        setPins(mapPins);
-      }
-
-      setLoading(false);
-    }
-
     loadReports();
-  }, []);
+  }, [loadReports]);
 
   const handlePostClick = useCallback((id: number) => {
     setActivePost(String(id));
@@ -214,6 +187,16 @@ export default function Page() {
     if (mapRef.current) mapRef.current.setView([42.3757, -72.5199], 15);
   }, []);
 
+  const handleMapClick = useCallback((lat: number, lng: number) => {
+    setClickedCoords({ lat, lng });
+    setCreateOpen(true);
+  }, []);
+
+  const handleCreateClose = useCallback(() => {
+    setCreateOpen(false);
+    setClickedCoords(null);
+  }, []);
+
   return (
     <main
       className="relative w-screen h-screen overflow-hidden bg-background"
@@ -226,6 +209,7 @@ export default function Page() {
         onReadMore={handleReadMore}
         selectedPinId={activePost ?? undefined}
         onMapReady={handleMapReady}
+        onMapClick={handleMapClick}
       />
 
       {/* Trending sidebar */}
@@ -254,7 +238,13 @@ export default function Page() {
       </button>
 
       {/* Create report modal */}
-      <CreateReportModal open={createOpen} onClose={() => setCreateOpen(false)} />
+      <CreateReportModal
+        open={createOpen}
+        onClose={handleCreateClose}
+        onReportCreated={loadReports}
+        initialLatitude={clickedCoords?.lat}
+        initialLongitude={clickedCoords?.lng}
+      />
 
       {/* User account button (top right) */}
       <button
@@ -264,6 +254,13 @@ export default function Page() {
       >
         <User size={20} className="text-gray-700" />
       </button>
+
+      {/* View report modal */}
+      <ViewReportModal
+        open={viewReportOpen}
+        onClose={() => { setViewReportOpen(false); setActivePost(null); }}
+        report={selectedPin}
+      />
     </main>
   );
 }

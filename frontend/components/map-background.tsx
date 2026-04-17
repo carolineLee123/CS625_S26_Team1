@@ -29,6 +29,7 @@ interface MapBackgroundProps {
   onReadMore?: (pinId: string) => void
   selectedPinId?: string
   onMapReady?: (map: any) => void
+  onMapClick?: (lat: number, lng: number) => void
 }
 
 export function MapBackground({
@@ -37,6 +38,7 @@ export function MapBackground({
   onReadMore,
   selectedPinId,
   onMapReady,
+  onMapClick,
 }: MapBackgroundProps) {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<any>(null)
@@ -96,7 +98,7 @@ export function MapBackground({
         map.current = null
       }
     }
-  }, [onMapReady])
+  }, [onMapReady, onMapClick])
 
   useEffect(() => {
     const updatePins = async () => {
