@@ -15,6 +15,7 @@ import { TrendingSidebar, type TrendingPost } from '@/components/trending-sideba
 import { MapControls } from '@/components/map-controls';
 import { fetchReports, type Report } from '@/lib/api';
 import { CreateReportModal } from '@/components/create-report-modal';
+// import { SearchBar } from "@/components/search-bar"; -- needs to be repurposed, updates underway
 
 // Helper functions to convert reports to UI format
 function getSafetyColorFromLevel(safetyLevel: string): string {
@@ -302,7 +303,55 @@ export default function Page() {
   }, []);
 
   const handleCenter = useCallback(() => {
-    if (mapRef.current) mapRef.current.setView([42.3601, -71.0589], 13);
+    if (!mapRef.current) return;
+  
+    if (!navigator.geolocation) {
+      console.error("Geolocation is not supported by this browser.");
+      return;
+    }
+  
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        mapRef.current?.setView([latitude, longitude], 14);
+      },
+      (error) => {
+        console.error("Unable to get current location:", error.message);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
+  }, []);
+
+  const handleSearchLocation = useCallback(async (query: string) => {
+    if (!mapRef.current || !query.trim()) return;
+  
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`
+      );
+  
+      if (!response.ok) {
+        throw new Error("Search request failed");
+      }
+  
+      const results = await response.json();
+  
+      if (!results.length) {
+        console.error("No matching location found.");
+        return;
+      }
+  
+      const lat = parseFloat(results[0].lat);
+      const lon = parseFloat(results[0].lon);
+  
+      mapRef.current.flyTo([lat, lon], 15);
+    } catch (error) {
+      console.error("Location search failed:", error);
+    }
   }, []);
 
   return (
@@ -325,6 +374,7 @@ export default function Page() {
         activePost={activePost ? parseInt(activePost) : null}
         onPostClick={handlePostClick}
         posts={posts}
+        onSearch={handleSearchLocation}
       />
 
       {/* Map controls (bottom right) */}

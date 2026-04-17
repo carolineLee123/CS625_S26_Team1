@@ -157,6 +157,7 @@ interface TrendingSidebarProps {
   activePost: number | null;
   onPostClick: (id: number) => void;
   posts?: TrendingPost[];
+  onSearch: (query: string) => void | Promise<void>;
 }
 
 const SUGGESTIONS = [
@@ -168,7 +169,7 @@ const SUGGESTIONS = [
   { type: "recent", label: "Portland, OR", sublabel: "Searched recently" },
 ];
 
-export function TrendingSidebar({ open, onClose, activePost, onPostClick, posts = POSTS }: TrendingSidebarProps) {
+export function TrendingSidebar({ open, onClose, activePost, onPostClick, posts = POSTS, onSearch, }: TrendingSidebarProps) {
   const [view, setView] = useState<"list" | "compact">("list");
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
@@ -182,6 +183,14 @@ export function TrendingSidebar({ open, onClose, activePost, onPostClick, posts 
     : SUGGESTIONS;
 
   const showDropdown = focused && suggestions.length > 0;
+
+  const handleSubmit = async (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+  
+    await onSearch(trimmed);
+    setFocused(false);
+  };
 
   const iconFor = (type: string) => {
     if (type === "location") return <MapPin size={14} className="text-blue-500 shrink-0" />;
@@ -212,45 +221,52 @@ export function TrendingSidebar({ open, onClose, activePost, onPostClick, posts 
         {/* Search bar in sidebar */}
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
           <div className="flex-1 relative">
-            <div
-              className={cn(
-                "flex items-center gap-2 h-9 px-3 rounded-lg border transition-all duration-200",
-                focused
-                  ? "border-blue-400 ring-1 ring-blue-200"
-                  : "border-gray-200 bg-gray-50"
-              )}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmit(query);
+              }}
             >
-              <Search
-                size={14}
+              <div
                 className={cn(
-                  "shrink-0 transition-colors",
-                  focused ? "text-blue-500" : "text-gray-400"
+                  "flex items-center gap-2 h-9 px-3 rounded-lg border transition-all duration-200",
+                  focused
+                    ? "border-blue-400 ring-1 ring-blue-200"
+                    : "border-gray-200 bg-gray-50"
                 )}
-                aria-hidden="true"
-              />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setTimeout(() => setFocused(false), 150)}
-                placeholder="Search..."
-                className="flex-1 bg-transparent text-xs text-foreground placeholder:text-gray-400 outline-none"
-                aria-label="Search locations or tags"
-                autoComplete="off"
-              />
-              {query && (
-                <button
-                  onClick={() => setQuery("")}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                  aria-label="Clear search"
-                >
-                  <X size={12} />
-                </button>
-              )}
-            </div>
+              >
+                <Search
+                  size={14}
+                  className={cn(
+                    "shrink-0 transition-colors",
+                    focused ? "text-blue-500" : "text-gray-400"
+                  )}
+                  aria-hidden="true"
+                />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onFocus={() => setFocused(true)}
+                  onBlur={() => setTimeout(() => setFocused(false), 150)}
+                  placeholder="Search..."
+                  className="flex-1 bg-transparent text-xs text-foreground placeholder:text-gray-400 outline-none"
+                  aria-label="Search locations or tags"
+                  autoComplete="off"
+                />
+                {query && (
+                  <button
+                    type="button"
+                    onClick={() => setQuery("")}
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                    aria-label="Clear search"
+                  >
+                    <X size={12} />
+                  </button>
+                )}
+              </div>
+            </form>
 
-            {/* Search dropdown */}
             {showDropdown && (
               <div
                 className="absolute top-full mt-1 left-0 right-0 rounded-lg border border-gray-200 overflow-hidden py-1 bg-white shadow-md z-40"
@@ -260,10 +276,11 @@ export function TrendingSidebar({ open, onClose, activePost, onPostClick, posts 
                 {suggestions.slice(0, 4).map((s, i) => (
                   <button
                     key={i}
+                    type="button"
                     className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 transition-colors text-left text-xs"
                     onMouseDown={() => {
                       setQuery(s.label);
-                      setFocused(false);
+                      handleSubmit(s.label);
                     }}
                     role="option"
                   >
@@ -277,6 +294,7 @@ export function TrendingSidebar({ open, onClose, activePost, onPostClick, posts 
               </div>
             )}
           </div>
+
           <button
             onClick={onClose}
             className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded-md ml-2 md:hidden"
