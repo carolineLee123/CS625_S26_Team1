@@ -15,6 +15,7 @@ import { TrendingSidebar, type TrendingPost } from '@/components/trending-sideba
 import { MapControls } from '@/components/map-controls';
 import { fetchReports, type Report } from '@/lib/api';
 import { CreateReportModal } from '@/components/create-report-modal';
+import { ViewReportModal } from '@/components/view-report-modal';
 
 // Helper functions to convert reports to UI format
 function getSafetyColorFromLevel(safetyLevel: string): string {
@@ -250,6 +251,8 @@ export default function Page() {
   const [pins, setPins] = useState<MapPin[]>(mapPins);
   const [loading, setLoading] = useState(true);
   const [clickedCoords, setClickedCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [viewReportOpen, setViewReportOpen] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<TrendingPost | null>(null);
 
   const loadReports = useCallback(async () => {
     console.log('Starting to load reports from API...');
@@ -293,7 +296,14 @@ export default function Page() {
         duration: 0.5
       });
     }
-  }, [pins]);
+
+    // Find the post and open the view modal
+    const post = posts.find(p => p.id === id);
+    if (post) {
+      setSelectedReport(post);
+      setViewReportOpen(true);
+    }
+  }, [pins, posts]);
 
   const handlePinClick = useCallback((pinId: string) => {
     setActivePost(pinId);
@@ -306,7 +316,14 @@ export default function Page() {
         duration: 0.5
       });
     }
-  }, [pins]);
+
+    // Find the post and open the view modal
+    const post = posts.find(p => p.id === parseInt(pinId));
+    if (post) {
+      setSelectedReport(post);
+      setViewReportOpen(true);
+    }
+  }, [pins, posts]);
 
   const handleMapReady = useCallback((map: L.Map) => {
     mapRef.current = map;
@@ -390,6 +407,27 @@ export default function Page() {
       >
         <User size={20} className="text-gray-700" />
       </button>
+
+      {/* View report modal */}
+      <ViewReportModal
+        open={viewReportOpen}
+        onClose={() => setViewReportOpen(false)}
+        report={selectedReport ? {
+          id: selectedReport.id,
+          title: selectedReport.username,
+          description: selectedReport.content,
+          location: selectedReport.location,
+          category: selectedReport.tag,
+          urgency: selectedReport.tag === 'Urgent' || selectedReport.tag === 'Warning' ? selectedReport.tag : undefined,
+          username: selectedReport.handle,
+          avatar: selectedReport.avatar,
+          timeAgo: selectedReport.timeAgo,
+          likes: selectedReport.likes,
+          comments: selectedReport.comments,
+          shares: selectedReport.shares,
+          tagColor: selectedReport.tagColor,
+        } : null}
+      />
     </main>
   );
 }
