@@ -21,35 +21,16 @@ def clear_and_add_boston_reports():
 
         # Boston-based reports with realistic locations
         boston_reports = [
-            # Downtown Boston - Broken streetlight
             (1, 42.3601, -71.0589, "Broken streetlight near Boston Common, needs immediate repair", "safety", "high"),
-
-            # Back Bay - Infrastructure issue
-            (1, 42.3505, -71.0826, "Large pothole on Boylston Street causing traffic delays", "infrastructure", "medium"),
-
-            # Fenway - Environmental
-            (1, 42.3467, -71.0972, "Fallen tree branch blocking sidewalk near Fenway Park", "environmental", "medium"),
-
-            # North End - Emergency
-            (1, 42.3647, -71.0542, "Water main break flooding street in North End", "emergency", "critical"),
-
-            # Beacon Hill - Maintenance
-            (1, 42.3588, -71.0707, "Overflowing trash bins on Charles Street", "maintenance", "low"),
-
-            # South End - Safety
+            (1, 42.3505, -71.0826, "Large pothole on Boylston Street causing traffic delays", "note", "medium"),
+            (1, 42.3467, -71.0972, "Fallen tree branch blocking sidewalk near Fenway Park", "note", "medium"),
+            (1, 42.3647, -71.0542, "Water main break flooding street in North End", "safety", "critical"),
+            (1, 42.3588, -71.0707, "Overflowing trash bins on Charles Street", "note", "low"),
             (1, 42.3467, -71.0707, "Broken glass on playground in South End park", "safety", "high"),
-
-            # Cambridge (across river) - Infrastructure
-            (1, 42.3736, -71.1097, "Damaged bike lane marking near MIT", "infrastructure", "low"),
-
-            # Seaport District - Other
-            (1, 42.3520, -71.0420, "Seagulls causing disturbance near outdoor dining area", "other", "low"),
-
-            # Allston - Safety
+            (1, 42.3736, -71.1097, "Damaged bike lane marking near MIT", "note", "low"),
+            (1, 42.3520, -71.0420, "Community cleanup event at Seaport this Saturday", "event", "low"),
             (1, 42.3543, -71.1308, "Unlit crosswalk near Boston University", "safety", "high"),
-
-            # Jamaica Plain - Environmental
-            (1, 42.3099, -71.1131, "Illegal dumping reported near Arboretum entrance", "environmental", "medium"),
+            (1, 42.3099, -71.1131, "Farmers market at Arboretum entrance every Sunday", "event", "low"),
         ]
 
         print("[INFO] Adding Boston-based reports...")

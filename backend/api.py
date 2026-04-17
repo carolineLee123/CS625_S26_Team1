@@ -85,8 +85,8 @@ def create_report():
         # Map frontend category to backend category
         category_map = {
             'Safety': 'safety',
-            'Event': 'infrastructure',
-            'Note': 'other'
+            'Event': 'event',
+            'Note': 'note'
         }
         category = category_map.get(data['category'], 'other')
 

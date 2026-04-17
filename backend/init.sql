@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS reports (
     latitude DECIMAL(10, 8) NOT NULL,
     longitude DECIMAL(11, 8) NOT NULL,
     description TEXT NOT NULL,
-    category ENUM('safety', 'maintenance', 'environmental', 'infrastructure', 'emergency', 'other') NOT NULL,
+    category ENUM('safety', 'event','note') NOT NULL,
     safety_level ENUM('low', 'medium', 'high', 'critical') NOT NULL,
     status ENUM('open', 'in_progress', 'resolved', 'closed') DEFAULT 'open',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -36,7 +36,7 @@ ON DUPLICATE KEY UPDATE username=username;
 
 -- Insert sample reports
 INSERT INTO reports (user_id, latitude, longitude, description, category, safety_level) VALUES
-(1, 37.7749, -122.4194, 'Pothole on main street causing traffic issues', 'infrastructure', 'medium'),
+(1, 37.7749, -122.4194, 'Pothole on main street causing traffic issues', 'note', 'medium'),
 (1, 37.7849, -122.4094, 'Broken streetlight in park area', 'safety', 'high'),
-(2, 37.7649, -122.4294, 'Fallen tree blocking sidewalk after storm', 'environmental', 'high')
+(2, 37.7649, -122.4294, 'Fallen tree blocking sidewalk after storm', 'safety', 'high')
 ON DUPLICATE KEY UPDATE description=description;
