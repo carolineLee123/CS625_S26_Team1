@@ -169,7 +169,7 @@ export function MapBackground({
             : ''
 
           const truncDesc = pin.description
-            ? pin.description.substring(0, 90) + (pin.description.length > 90 ? '…' : '')
+            ? pin.description.substring(0, 160) + (pin.description.length > 160 ? '…' : '')
             : ''
 
           const tooltipContent = `

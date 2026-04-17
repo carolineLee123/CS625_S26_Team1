@@ -117,7 +117,7 @@
   }
 }
 
-/* ── Tag color system (source of truth) ───────────────────────────────────── */
+/*Tag color system */
 :root {
   /* Base accent (used for outlines, map pins, and solid buttons) */
   --tag-safety:    #f97316; /* orange-500 */
@@ -155,7 +155,11 @@
 .tag-outline-warning   { color: var(--tag-warning);   border: 1px solid var(--tag-warning);   background: transparent; }
 .tag-outline-nonurgent { color: var(--tag-nonurgent); border: 1px solid var(--tag-nonurgent); background: transparent; }
 .tag-outline-weather   { color: var(--tag-weather);   border: 1px solid var(--tag-weather);   background: transparent; }
-/* ── End tag color system ─────────────────────────────────────────────────── */
+
+.leaflet-tooltip.custom-tooltip,
+.leaflet-tooltip.custom-tooltip * {
+  white-space: normal;
+}
 
 .leaflet-tooltip.custom-tooltip {
   background: white;
