@@ -9,31 +9,12 @@ import {
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { type MapPin } from '@/components/map-background';
+import { getCategoryTag, getUrgencyTag } from '@/lib/tags';
 
 interface ViewReportModalProps {
   open: boolean;
   onClose: () => void;
   report: MapPin | null;
-}
-
-function getUrgencyLabel(safetyLevel?: string): string | null {
-  if (safetyLevel === 'critical' || safetyLevel === 'high') return 'Urgent';
-  if (safetyLevel === 'medium') return 'Warning';
-  if (safetyLevel === 'low') return 'Note';
-  return null;
-}
-
-function getUrgencyClass(label: string | null): string {
-  if (label === 'Urgent') return 'tag-urgent';
-  if (label === 'Warning') return 'tag-warning';
-  return 'tag-nonurgent';
-}
-
-function getCategoryClass(category?: string): string {
-  const map: Record<string, string> = {
-    safety: 'tag-safety', event: 'tag-event', note: 'tag-note', weather: 'tag-weather',
-  };
-  return category ? (map[category.toLowerCase()] ?? 'tag-note') : 'tag-note';
 }
 
 function getTimeAgo(dateString?: string): string {
@@ -55,12 +36,8 @@ function getInitials(name?: string): string {
 export function ViewReportModal({ open, onClose, report }: ViewReportModalProps) {
   if (!report) return null;
 
-  const urgencyLabel = getUrgencyLabel(report.safetyLevel);
-  const urgencyClass = getUrgencyClass(urgencyLabel);
-  const categoryClass = getCategoryClass(report.category);
-  const categoryLabel = report.category
-    ? report.category.charAt(0).toUpperCase() + report.category.slice(1)
-    : '';
+  const urgencyTag = getUrgencyTag(report.category, report.safetyLevel);
+  const categoryTag = getCategoryTag(report.category);
   const postedLabel = report.createdAt
     ? `Posted ${new Date(report.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
     : getTimeAgo(report.createdAt);
@@ -93,16 +70,14 @@ export function ViewReportModal({ open, onClose, report }: ViewReportModalProps)
                     : 'Inactive'}
                 </span>
               )}
-              {urgencyLabel && (
-                <span className={cn('rounded-full px-3 py-0.5 text-xs font-semibold', urgencyClass)}>
-                  {urgencyLabel}
+              {urgencyTag && (
+                <span className={cn('rounded-full px-3 py-0.5 text-xs font-semibold', urgencyTag.cssClass)}>
+                  {urgencyTag.label}
                 </span>
               )}
-              {categoryLabel && (
-                <span className={cn('rounded-full px-3 py-0.5 text-xs font-semibold', categoryClass)}>
-                  {categoryLabel}
-                </span>
-              )}
+              <span className={cn('rounded-full px-3 py-0.5 text-xs font-semibold', categoryTag.cssClass)}>
+                {categoryTag.label}
+              </span>
             </div>
 
             {/* Metadata grid */}
@@ -124,7 +99,7 @@ export function ViewReportModal({ open, onClose, report }: ViewReportModalProps)
                   <User size={12} /> Reported by
                 </span>
                 <span className="flex items-center gap-1.5 text-xs text-gray-500">
-                  <span className={cn('w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0', categoryClass)}>
+                  <span className={cn('w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0', categoryTag.cssClass)}>
                     {getInitials(report.username)}
                   </span>
                   {report.username ?? 'Anonymous'}

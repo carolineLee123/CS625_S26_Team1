@@ -16,35 +16,16 @@ import { MapControls } from '@/components/map-controls';
 import { fetchReports, type Report } from '@/lib/api';
 import { CreateReportModal } from '@/components/create-report-modal';
 import { ViewReportModal } from '@/components/view-report-modal';
+import { getPrimaryTag } from '@/lib/tags';
 
-// Helper functions to convert reports to UI format
-function getSafetyColorFromLevel(safetyLevel: string): string {
+function getSafetyColorFromLevel(category: string, safetyLevel: string): string {
+  if (category === 'event') return '#14b8a6';
+  if (category === 'note')  return '#6b7280';
   switch (safetyLevel) {
     case 'critical':
-      return '#ef4444';
-    case 'high':
-      return '#ef4444';
-    case 'medium':
-      return '#f59e0b';
-    case 'low':
-      return '#14b8a6';
-    default:
-      return '#6b7280';
-  }
-}
-
-function getTagFromSafetyLevel(safetyLevel: string): { tag: string; tagColor: 'urgent' | 'warning' | 'event' | 'note' | 'nonurgent' } {
-  switch (safetyLevel) {
-    case 'critical':
-      return { tag: 'Urgent', tagColor: 'urgent' };
-    case 'high':
-      return { tag: 'Warning', tagColor: 'warning' };
-    case 'medium':
-      return { tag: 'Warning', tagColor: 'warning' };
-    case 'low':
-      return { tag: 'Note', tagColor: 'note' };
-    default:
-      return { tag: 'Non-urgent', tagColor: 'nonurgent' };
+    case 'high':   return '#ef4444';
+    case 'medium': return '#f59e0b';
+    default:       return '#6b7280';
   }
 }
 
@@ -62,7 +43,7 @@ function getTimeAgo(dateString: string): string {
 }
 
 function convertReportToPost(report: Report, rank: number): TrendingPost {
-  const { tag, tagColor } = getTagFromSafetyLevel(report.safety_level);
+  const { tag, tagColor } = getPrimaryTag(report.category, report.safety_level);
   const initials = report.username.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
 
   return {
@@ -88,7 +69,7 @@ function convertReportToPin(report: Report): MapPin {
     lat: report.latitude,
     lng: report.longitude,
     title: report.title,
-    color: getSafetyColorFromLevel(report.safety_level),
+    color: getSafetyColorFromLevel(report.category, report.safety_level),
     number: report.id,
     description: report.description,
     category: report.category,

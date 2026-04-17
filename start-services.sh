@@ -20,7 +20,7 @@ docker compose up -d
 sleep 5
 
 # Start Flask API in background
-echo "Starting Flask API on http://localhost:5000..."
+echo "Starting Flask API on http://localhost:5001..."
 source venv/bin/activate
 cd backend
 nohup python api.py > /tmp/flask_api.log 2>&1 &
@@ -45,7 +45,7 @@ echo "All services started successfully!"
 echo "=========================================="
 echo ""
 echo "Frontend: http://localhost:3000"
-echo "Backend API: http://localhost:5000/api/reports"
+echo "Backend API: http://localhost:5001/api/reports"
 echo ""
 echo "To view logs:"
 echo "  Flask API: tail -f /tmp/flask_api.log"
