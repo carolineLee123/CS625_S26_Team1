@@ -143,7 +143,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
         location,
         category,
         description,
-        urgency: category === 'Safety' ? urgency : undefined,
+        urgency: category === 'Safety' ? (urgency ?? undefined) : undefined,
         latitude,
         longitude,
       };

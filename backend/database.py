@@ -104,7 +104,8 @@ class DatabaseManager:
             query = """
             SELECT r.id, r.latitude, r.longitude, r.description,
                    r.category, r.safety_level, r.status, r.created_at,
-                   r.updated_at, u.username
+                   r.updated_at, r.likes, r.comments, r.shares, r.verified_count,
+                   u.username
             FROM reports r
             JOIN users u ON r.user_id = u.id
             ORDER BY r.created_at DESC
@@ -135,7 +136,8 @@ class DatabaseManager:
             query = """
             SELECT r.id, r.latitude, r.longitude, r.description,
                    r.category, r.safety_level, r.status, r.created_at,
-                   r.updated_at, u.username
+                   r.updated_at, r.likes, r.comments, r.shares, r.verified_count,
+                   u.username
             FROM reports r
             JOIN users u ON r.user_id = u.id
             WHERE r.id = %s
@@ -202,7 +204,8 @@ class DatabaseManager:
             cursor.execute("""
                 SELECT r.id, r.latitude, r.longitude, r.description,
                        r.category, r.safety_level, r.status, r.created_at,
-                       r.updated_at, u.username
+                       r.updated_at, r.likes, r.comments, r.shares, r.verified_count,
+                       u.username
                 FROM reports r
                 JOIN users u ON r.user_id = u.id
                 WHERE r.id = %s

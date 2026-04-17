@@ -139,5 +139,5 @@ def create_report():
         }), 500
 
 if __name__ == '__main__':
-    port = int(os.getenv('API_PORT', 5000))
+    port = int(os.getenv('API_PORT', 5001))
     app.run(debug=True, host='0.0.0.0', port=port)

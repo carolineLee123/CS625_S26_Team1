@@ -17,6 +17,9 @@ export interface MapPin {
   status?: string
   createdAt?: string
   verifiedCount?: number
+  likes?: number
+  comments?: number
+  shares?: number
   username?: string
 }
 
@@ -136,10 +139,11 @@ export function MapBackground({
         if (pin.description || pin.category || pin.safetyLevel) {
           isRich = true
 
-          const urgencyLabel = (pin.safetyLevel === 'critical' || pin.safetyLevel === 'high') ? 'Urgent'
+          const isSafety = pin.category === 'safety' || !pin.category
+          const urgencyLabel = !isSafety ? null
+            : (pin.safetyLevel === 'critical' || pin.safetyLevel === 'high') ? 'Urgent'
             : pin.safetyLevel === 'medium' ? 'Warning'
-            : pin.safetyLevel === 'low' ? 'Note'
-            : null
+            : 'Non-urgent'
           const urgencyClass = urgencyLabel === 'Urgent' ? 'tag-urgent'
             : urgencyLabel === 'Warning' ? 'tag-warning'
             : 'tag-nonurgent'

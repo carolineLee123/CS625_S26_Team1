@@ -5,9 +5,13 @@ export interface Report {
   latitude: number;
   longitude: number;
   description: string;
-  category: 'safety' | 'event' | 'note' | 'weather';
+  category: 'safety' | 'event' | 'note' | 'weather' | 'infrastructure' | 'other';
   safety_level: 'low' | 'medium' | 'high' | 'critical';
   status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  likes: number;
+  comments: number;
+  shares: number;
+  verified_count: number;
   created_at: string;
   updated_at: string;
   username: string;
