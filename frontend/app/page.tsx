@@ -68,7 +68,7 @@ function convertReportToPost(report: Report, rank: number): TrendingPost {
   return {
     id: report.id,
     rank,
-    username: report.description.split('.')[0] || 'Report',
+    username: report.title,
     handle: report.username,
     avatar: initials,
     content: report.description,
@@ -87,7 +87,7 @@ function convertReportToPin(report: Report): MapPin {
     id: String(report.id),
     lat: report.latitude,
     lng: report.longitude,
-    title: report.description.split('.')[0] || 'Report',
+    title: report.title,
     color: getSafetyColorFromLevel(report.safety_level),
     number: report.id,
     description: report.description,
@@ -119,6 +119,7 @@ export default function Page() {
   const posts = useMemo<TrendingPost[]>(
     () => pins.map((pin, index) => convertReportToPost({
       id: Number(pin.id),
+      title: pin.title,
       username: pin.username ?? '',
       description: pin.description ?? '',
       latitude: pin.lat,

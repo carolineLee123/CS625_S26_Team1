@@ -102,7 +102,7 @@ class DatabaseManager:
         try:
             cursor = self.connection.cursor(dictionary=True)
             query = """
-            SELECT r.id, r.latitude, r.longitude, r.description,
+            SELECT r.id, r.title, r.latitude, r.longitude, r.description,
                    r.category, r.safety_level, r.status, r.created_at,
                    r.updated_at, r.likes, r.comments, r.shares, r.verified_count,
                    u.username
@@ -134,7 +134,7 @@ class DatabaseManager:
         try:
             cursor = self.connection.cursor(dictionary=True)
             query = """
-            SELECT r.id, r.latitude, r.longitude, r.description,
+            SELECT r.id, r.title, r.latitude, r.longitude, r.description,
                    r.category, r.safety_level, r.status, r.created_at,
                    r.updated_at, r.likes, r.comments, r.shares, r.verified_count,
                    u.username
@@ -187,14 +187,11 @@ class DatabaseManager:
         try:
             cursor = self.connection.cursor(dictionary=True)
 
-            # Combine title and description for the description field
-            full_description = f"{title}. {description}" if title else description
-
             query = """
-            INSERT INTO reports (user_id, latitude, longitude, description, category, safety_level, status)
-            VALUES (%s, %s, %s, %s, %s, %s, 'open')
+            INSERT INTO reports (user_id, latitude, longitude, title, description, category, safety_level, status)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, 'open')
             """
-            cursor.execute(query, (user_id, latitude, longitude, full_description, category, safety_level))
+            cursor.execute(query, (user_id, latitude, longitude, title, description, category, safety_level))
             self.connection.commit()
 
             report_id = cursor.lastrowid

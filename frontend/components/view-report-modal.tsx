@@ -145,10 +145,10 @@ export function ViewReportModal({ open, onClose, report }: ViewReportModalProps)
 
             {/* Stats */}
             <div className="flex items-center gap-5 pt-1 border-t border-gray-100 text-xs text-gray-400">
-              <span className="flex items-center gap-1"><Heart size={12} /> 0</span>
-              <span className="flex items-center gap-1"><MessageCircle size={12} /> 0</span>
+              <span className="flex items-center gap-1"><Heart size={12} /> {report.likes ?? 0}</span>
+              <span className="flex items-center gap-1"><MessageCircle size={12} /> {report.comments ?? 0}</span>
               <span className="flex items-center gap-1"><Hash size={12} />✓ {report.verifiedCount ?? 0}</span>
-              <span className="flex items-center gap-1 ml-auto"><Share2 size={12} /></span>
+              <span className="flex items-center gap-1 ml-auto"><Share2 size={12} /> {report.shares ?? 0}</span>
             </div>
           </div>
         </div>
