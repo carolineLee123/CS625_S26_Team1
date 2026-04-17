@@ -97,6 +97,7 @@ function convertReportToPin(report: Report): MapPin {
     status: report.status,
     createdAt: report.created_at,
     verifiedCount: 0,
+    username: report.username,
   };
 }
 
@@ -206,7 +207,6 @@ const mapPins: MapPin[] = [
     description: 'Active Winter Weather Warning for winter blizzard storm in the Amherst Area. Expected Temps 20-25 tonight.',
     category: 'safety',
     safetyLevel: 'critical',
-
     location: 'Amherst, MA',
     status: 'open',
     createdAt: new Date().toISOString(),
@@ -222,7 +222,6 @@ const mapPins: MapPin[] = [
     description: 'On the 2nd floor of the Men\'s restroom, there\'s some water I noticed. The people at the desk said they are aware.',
     category: 'safety',
     safetyLevel: 'medium',
-
     location: 'John W. Lodges Graduate Research Center',
     status: 'in_progress',
     createdAt: new Date().toISOString(),
@@ -238,7 +237,6 @@ const mapPins: MapPin[] = [
     description: 'A collaboration between UMass Permaculture and the UMass Student Farmers Market. Fresh seasonal produce available.',
     category: 'event',
     safetyLevel: 'low',
-
     location: 'Student Union · 41 Campus Center Way',
     status: 'closed',
     createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
@@ -254,7 +252,6 @@ const mapPins: MapPin[] = [
     description: 'Scheduled maintenance on building systems. Campus security is monitoring the area.',
     category: 'safety',
     safetyLevel: 'low',
-
     location: 'Central Campus, MA',
     status: 'open',
     createdAt: new Date().toISOString(),
@@ -304,7 +301,7 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [clickedCoords, setClickedCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [viewReportOpen, setViewReportOpen] = useState(false);
-  const [selectedReport, setSelectedReport] = useState<TrendingPost | null>(null);
+  const [selectedPin, setSelectedPin] = useState<MapPin | null>(null);
 
   const loadReports = useCallback(async () => {
     console.log('Starting to load reports from API...');
@@ -355,27 +352,22 @@ export default function Page() {
     setActivePost(pinId);
 
     const pin = pins.find(p => p.id === pinId);
-    if (pin && mapRef.current) {
-      mapRef.current.setView([pin.lat, pin.lng], 16, {
-        animate: true,
-        duration: 0.5
-      });
-    }
-
-    const post = posts.find(p => String(p.id) === pinId);
-    if (post) {
-      setSelectedReport(post);
+    if (pin) {
+      if (mapRef.current) {
+        mapRef.current.setView([pin.lat, pin.lng], 16, { animate: true, duration: 0.5 });
+      }
+      setSelectedPin(pin);
       setViewReportOpen(true);
     }
-  }, [pins, posts]);
+  }, [pins]);
 
   const handleReadMore = useCallback((pinId: string) => {
-    const post = posts.find(p => p.id === parseInt(pinId));
-    if (post) {
-      setSelectedReport(post);
+    const pin = pins.find(p => p.id === pinId);
+    if (pin) {
+      setSelectedPin(pin);
       setViewReportOpen(true);
     }
-  }, [posts]);
+  }, [pins]);
 
   const handleMapReady = useCallback((map: L.Map) => {
     mapRef.current = map;
@@ -464,22 +456,8 @@ export default function Page() {
       {/* View report modal */}
       <ViewReportModal
         open={viewReportOpen}
-        onClose={() => setViewReportOpen(false)}
-        report={selectedReport ? {
-          id: selectedReport.id,
-          title: selectedReport.username,
-          description: selectedReport.content,
-          location: selectedReport.location,
-          category: selectedReport.tag,
-          urgency: selectedReport.tag === 'Urgent' || selectedReport.tag === 'Warning' ? selectedReport.tag : undefined,
-          username: selectedReport.handle,
-          avatar: selectedReport.avatar,
-          timeAgo: selectedReport.timeAgo,
-          likes: selectedReport.likes,
-          comments: selectedReport.comments,
-          shares: selectedReport.shares,
-          tagColor: selectedReport.tagColor,
-        } : null}
+        onClose={() => { setViewReportOpen(false); setActivePost(null); }}
+        report={selectedPin}
       />
     </main>
   );

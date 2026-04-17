@@ -17,6 +17,7 @@ export interface MapPin {
   status?: string
   createdAt?: string
   verifiedCount?: number
+  username?: string
 }
 
 interface MapBackgroundProps {
@@ -209,7 +210,7 @@ export function MapBackground({
         })
 
         // Invisible bridge child div: extends upward from the marker element to
-        // cover the gap between the pin circle and the tooltip card. Since it is
+        // cover the gap between the pin circle and the hover preview tooltip card. Since it is
         // a child of the marker element, the browser never fires mouseleave on the
         // marker while the cursor is crossing that gap.
         const markerEl = marker.getElement() as HTMLElement | undefined
