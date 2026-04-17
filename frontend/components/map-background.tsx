@@ -36,6 +36,7 @@ export function MapBackground({
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<any>(null)
   const markersRef = useRef<{ [key: string]: any }>({})
+  const tooltipDataRef = useRef<{ [key: string]: { content: string; rich: boolean } }>({})
   const [mapReady, setMapReady] = useState(false)
 
   useEffect(() => {
@@ -193,11 +194,13 @@ export function MapBackground({
             opacity: 1,
             className: 'custom-tooltip'
           })
+          tooltipDataRef.current[pin.id] = { content: tooltipContent, rich: true }
         } else {
           marker.bindTooltip(pin.title, {
             direction: 'top',
             offset: [0, -20],
           })
+          tooltipDataRef.current[pin.id] = { content: pin.title, rich: false }
         }
 
         markersRef.current[pin.id] = marker
@@ -208,16 +211,25 @@ export function MapBackground({
   }, [pins, onPinClick, mapReady])
 
   useEffect(() => {
-    Object.entries(markersRef.current).forEach(([pinId]) => {
+    Object.entries(markersRef.current).forEach(([pinId, marker]) => {
+      const isPinned = pinId === selectedPinId
       const pinEl = document.querySelector(`.map-pin-${pinId}`) as HTMLElement | null
       if (pinEl) {
-        if (pinId === selectedPinId) {
-          pinEl.style.transform = "scale(1.3)"
-          pinEl.style.zIndex = "1000"
-        } else {
-          pinEl.style.transform = "scale(1)"
-          pinEl.style.zIndex = "999"
-        }
+        pinEl.style.transform = isPinned ? "scale(1.3)" : "scale(1)"
+        pinEl.style.zIndex = isPinned ? "1000" : "999"
+      }
+
+      const data = tooltipDataRef.current[pinId]
+      if (data) {
+        marker.unbindTooltip()
+        marker.bindTooltip(data.content, {
+          direction: 'top',
+          offset: [0, -20],
+          opacity: 1,
+          ...(data.rich ? { className: 'custom-tooltip' } : {}),
+          permanent: isPinned,
+        })
+        if (isPinned) marker.openTooltip()
       }
     })
   }, [selectedPinId])
