@@ -15,7 +15,6 @@ import { TrendingSidebar, type TrendingPost } from '@/components/trending-sideba
 import { MapControls } from '@/components/map-controls';
 import { fetchReports, type Report } from '@/lib/api';
 import { CreateReportModal } from '@/components/create-report-modal';
-import { ViewReportModal } from '@/components/view-report-modal';
 
 // Helper functions to convert reports to UI format
 function getSafetyColorFromLevel(safetyLevel: string): string {
@@ -304,80 +303,45 @@ export default function Page() {
   const [posts, setPosts] = useState<TrendingPost[]>(POSTS);
   const [pins, setPins] = useState<MapPin[]>(mapPins);
   const [loading, setLoading] = useState(true);
-  const [clickedCoords, setClickedCoords] = useState<{ lat: number; lng: number } | null>(null);
-  const [viewReportOpen, setViewReportOpen] = useState(false);
-  const [selectedReport, setSelectedReport] = useState<TrendingPost | null>(null);
-
-  const loadReports = useCallback(async () => {
-    console.log('Starting to load reports from API...');
-    setLoading(true);
-    const reports = await fetchReports();
-    console.log('Fetched reports:', reports);
-    console.log('Number of reports:', reports.length);
-
-    if (reports.length > 0) {
-      const convertedPosts = reports.map((report, index) => convertReportToPost(report, index + 1));
-      const convertedPins = reports.map(report => convertReportToPin(report));
-
-      console.log('Converted pins:', convertedPins);
-      setPosts(convertedPosts);
-      setPins(convertedPins);
-
-      if (convertedPosts.length > 0) {
-        setActivePost(String(convertedPosts[0].id));
-      }
-    } else {
-      console.log('No reports found, using fallback data');
-      setPosts(POSTS);
-      setPins(mapPins);
-    }
-
-    setLoading(false);
-  }, []);
 
   useEffect(() => {
+    async function loadReports() {
+      console.log('Starting to load reports from API...');
+      setLoading(true);
+      const reports = await fetchReports();
+      console.log('Fetched reports:', reports);
+      console.log('Number of reports:', reports.length);
+
+      if (reports.length > 0) {
+        const convertedPosts = reports.map((report, index) => convertReportToPost(report, index + 1));
+        const convertedPins = reports.map(report => convertReportToPin(report));
+
+        console.log('Converted pins:', convertedPins);
+        setPosts(convertedPosts);
+        setPins(convertedPins);
+
+        if (convertedPosts.length > 0) {
+          setActivePost(String(convertedPosts[0].id));
+        }
+      } else {
+        console.log('No reports found, using fallback data');
+        setPosts(POSTS);
+        setPins(mapPins);
+      }
+
+      setLoading(false);
+    }
+
     loadReports();
-  }, [loadReports]);
+  }, []);
 
   const handlePostClick = useCallback((id: number) => {
     setActivePost(String(id));
-
-    // Find the pin with this ID and center map on it
-    const pin = pins.find(p => p.id === String(id));
-    if (pin && mapRef.current) {
-      mapRef.current.setView([pin.lat, pin.lng], 16, {
-        animate: true,
-        duration: 0.5
-      });
-    }
-
-    // Find the post and open the view modal
-    const post = posts.find(p => p.id === id);
-    if (post) {
-      setSelectedReport(post);
-      setViewReportOpen(true);
-    }
-  }, [pins, posts]);
+  }, []);
 
   const handlePinClick = useCallback((pinId: string) => {
     setActivePost(pinId);
-
-    // Center map on the clicked pin
-    const pin = pins.find(p => p.id === pinId);
-    if (pin && mapRef.current) {
-      mapRef.current.setView([pin.lat, pin.lng], 16, {
-        animate: true,
-        duration: 0.5
-      });
-    }
-
-    // Find the post and open the view modal
-    const post = posts.find(p => p.id === parseInt(pinId));
-    if (post) {
-      setSelectedReport(post);
-      setViewReportOpen(true);
-    }
-  }, [pins, posts]);
+  }, []);
 
   const handleMapReady = useCallback((map: L.Map) => {
     mapRef.current = map;
@@ -395,16 +359,6 @@ export default function Page() {
     if (mapRef.current) mapRef.current.setView([42.3757, -72.5199], 15);
   }, []);
 
-  const handleMapClick = useCallback((lat: number, lng: number) => {
-    setClickedCoords({ lat, lng });
-    setCreateOpen(true);
-  }, []);
-
-  const handleCreateClose = useCallback(() => {
-    setCreateOpen(false);
-    setClickedCoords(null);
-  }, []);
-
   return (
     <main
       className="relative w-screen h-screen overflow-hidden bg-background"
@@ -416,7 +370,6 @@ export default function Page() {
         onPinClick={handlePinClick}
         selectedPinId={activePost ?? undefined}
         onMapReady={handleMapReady}
-        onMapClick={handleMapClick}
       />
 
       {/* Trending sidebar */}
@@ -445,13 +398,7 @@ export default function Page() {
       </button>
 
       {/* Create report modal */}
-      <CreateReportModal
-        open={createOpen}
-        onClose={handleCreateClose}
-        onReportCreated={loadReports}
-        initialLatitude={clickedCoords?.lat}
-        initialLongitude={clickedCoords?.lng}
-      />
+      <CreateReportModal open={createOpen} onClose={() => setCreateOpen(false)} />
 
       {/* User account button (top right) */}
       <button
@@ -461,27 +408,6 @@ export default function Page() {
       >
         <User size={20} className="text-gray-700" />
       </button>
-
-      {/* View report modal */}
-      <ViewReportModal
-        open={viewReportOpen}
-        onClose={() => setViewReportOpen(false)}
-        report={selectedReport ? {
-          id: selectedReport.id,
-          title: selectedReport.username,
-          description: selectedReport.content,
-          location: selectedReport.location,
-          category: selectedReport.tag,
-          urgency: selectedReport.tag === 'Urgent' || selectedReport.tag === 'Warning' ? selectedReport.tag : undefined,
-          username: selectedReport.handle,
-          avatar: selectedReport.avatar,
-          timeAgo: selectedReport.timeAgo,
-          likes: selectedReport.likes,
-          comments: selectedReport.comments,
-          shares: selectedReport.shares,
-          tagColor: selectedReport.tagColor,
-        } : null}
-      />
     </main>
   );
 }
