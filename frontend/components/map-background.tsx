@@ -207,6 +207,11 @@ export function MapBackground({
         pinEl.style.zIndex = isPinned ? "1000" : "999"
       }
 
+      // Disable hover events on the selected pin's marker so the permanent
+      // card doesn't flicker and cursor-over-card doesn't retrigger it.
+      const markerEl = marker.getElement() as HTMLElement | undefined
+      if (markerEl) markerEl.style.pointerEvents = isPinned ? 'none' : 'auto'
+
       const data = tooltipDataRef.current[pinId]
       if (data) {
         marker.unbindTooltip()
@@ -217,7 +222,13 @@ export function MapBackground({
           ...(data.rich ? { className: 'custom-tooltip' } : {}),
           permanent: isPinned,
         })
-        if (isPinned) marker.openTooltip()
+        if (isPinned) {
+          marker.openTooltip()
+          // Inline style beats Leaflet's stylesheet — card blocks mouse events
+          // so pins underneath can't trigger hover tooltips
+          const tooltipEl = marker.getTooltip()?.getElement() as HTMLElement | undefined
+          if (tooltipEl) tooltipEl.style.pointerEvents = 'auto'
+        }
       }
     })
   }, [selectedPinId])
