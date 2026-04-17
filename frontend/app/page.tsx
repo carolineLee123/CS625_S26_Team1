@@ -82,6 +82,7 @@ function convertReportToPost(report: Report, rank: number): TrendingPost {
 }
 
 function convertReportToPin(report: Report): MapPin {
+  const { tag } = getTagFromSafetyLevel(report.safety_level);
   return {
     id: String(report.id),
     lat: report.latitude,
@@ -92,6 +93,11 @@ function convertReportToPin(report: Report): MapPin {
     description: report.description,
     category: report.category,
     safetyLevel: report.safety_level,
+    urgency: tag,
+    location: `${report.latitude.toFixed(4)}, ${report.longitude.toFixed(4)}`,
+    status: report.status,
+    createdAt: report.created_at,
+    verifiedCount: 0,
   };
 }
 
@@ -198,46 +204,94 @@ const mapPins: MapPin[] = [
     title: 'Winter Weather Alert',
     color: '#ef4444',
     number: 1,
+    description: 'Active Winter Weather Warning for winter blizzard storm in the Amherst Area. Expected Temps 20-25 tonight.',
+    category: 'safety',
+    safetyLevel: 'critical',
+    urgency: 'Urgent',
+    location: 'Amherst, MA',
+    status: 'open',
+    createdAt: new Date().toISOString(),
+    verifiedCount: 14,
   },
   {
     id: '2',
     lat: 42.374,
     lng: -72.525,
-    title: 'Minor Flooding',
+    title: 'Minor Flooding in Men\'s 2nd Floor Bath',
     color: '#f59e0b',
     number: 2,
+    description: 'On the 2nd floor of the Men\'s restroom, there\'s some water I noticed. The people at the desk said they are aware.',
+    category: 'safety',
+    safetyLevel: 'medium',
+    urgency: 'Warning',
+    location: 'John W. Lodges Graduate Research Center',
+    status: 'in_progress',
+    createdAt: new Date().toISOString(),
+    verifiedCount: 3,
   },
   {
     id: '3',
     lat: 42.375,
     lng: -72.527,
-    title: 'Farmers Market',
+    title: 'Weekly Student Farmers Market',
     color: '#14b8a6',
     number: 3,
+    description: 'A collaboration between UMass Permaculture and the UMass Student Farmers Market. Fresh seasonal produce available.',
+    category: 'event',
+    safetyLevel: 'low',
+    urgency: 'Non-urgent',
+    location: 'Student Union · 41 Campus Center Way',
+    status: 'closed',
+    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    verifiedCount: 6,
   },
   {
     id: '4',
     lat: 42.376,
     lng: -72.523,
-    title: 'Campus Safety',
-    color: '#ef4444',
+    title: 'Campus Maintenance Notice',
+    color: '#6b7280',
     number: 4,
+    description: 'Scheduled maintenance on building systems. Campus security is monitoring the area.',
+    category: 'safety',
+    safetyLevel: 'low',
+    urgency: 'Non-urgent',
+    location: 'Central Campus, MA',
+    status: 'open',
+    createdAt: new Date().toISOString(),
+    verifiedCount: 2,
   },
   {
     id: '5',
     lat: 42.372,
     lng: -72.522,
-    title: 'Local Business',
+    title: 'Campus Event Reminder',
     color: '#14b8a6',
     number: 5,
+    description: 'Community gathering in the central plaza this weekend. Open to all students and staff.',
+    category: 'event',
+    safetyLevel: 'low',
+    urgency: 'Non-urgent',
+    location: 'Downtown Amherst, MA',
+    status: 'open',
+    createdAt: new Date().toISOString(),
+    verifiedCount: 0,
   },
   {
     id: '6',
     lat: 42.373,
     lng: -72.528,
-    title: 'Market Square',
+    title: 'Farmers Market Update',
     color: '#f59e0b',
     number: 6,
+    description: 'Fresh seasonal produce available this week. Support local farming and community.',
+    category: 'event',
+    safetyLevel: 'low',
+    urgency: 'Non-urgent',
+    location: 'Market Square, MA',
+    status: 'open',
+    createdAt: new Date().toISOString(),
+    verifiedCount: 1,
   },
 ];
 
@@ -302,7 +356,7 @@ export default function Page() {
   }, []);
 
   const handleCenter = useCallback(() => {
-    if (mapRef.current) mapRef.current.setView([42.3601, -71.0589], 13);
+    if (mapRef.current) mapRef.current.setView([42.3757, -72.5199], 15);
   }, []);
 
   return (

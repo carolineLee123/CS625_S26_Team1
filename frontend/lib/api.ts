@@ -5,7 +5,7 @@ export interface Report {
   latitude: number;
   longitude: number;
   description: string;
-  category: 'safety' | 'maintenance' | 'environmental' | 'infrastructure' | 'emergency' | 'other';
+  category: 'safety' | 'event' | 'note' | 'weather';
   safety_level: 'low' | 'medium' | 'high' | 'critical';
   status: 'open' | 'in_progress' | 'resolved' | 'closed';
   created_at: string;

@@ -29,7 +29,7 @@ export interface TrendingPost {
   comments: number;
   shares: number;
   tag: string;
-  tagColor: "urgent" | "warning" | "nonurgent" | "note" | "event" | "active" | "inactive";
+  tagColor: "urgent" | "warning" | "nonurgent" | "safety" | "note" | "event" | "weather";
   timeAgo: string;
 }
 
@@ -46,7 +46,7 @@ const POSTS: TrendingPost[] = [
     comments: 832,
     shares: 2100,
     tag: "#GoldenHour",
-    tagColor: "warm",
+    tagColor: "event",
     timeAgo: "12m",
   },
   {
@@ -61,7 +61,7 @@ const POSTS: TrendingPost[] = [
     comments: 1340,
     shares: 1600,
     tag: "#HiddenGem",
-    tagColor: "hot",
+    tagColor: "note",
     timeAgo: "28m",
   },
   {
@@ -76,7 +76,7 @@ const POSTS: TrendingPost[] = [
     comments: 560,
     shares: 3200,
     tag: "#Sakura",
-    tagColor: "cool",
+    tagColor: "event",
     timeAgo: "45m",
   },
   {
@@ -91,7 +91,7 @@ const POSTS: TrendingPost[] = [
     comments: 412,
     shares: 980,
     tag: "#LiveMusic",
-    tagColor: "warm",
+    tagColor: "event",
     timeAgo: "1h",
   },
   {
@@ -106,7 +106,7 @@ const POSTS: TrendingPost[] = [
     comments: 290,
     shares: 750,
     tag: "#StreetArt",
-    tagColor: "cool",
+    tagColor: "note",
     timeAgo: "2h",
   },
   {
@@ -121,29 +121,29 @@ const POSTS: TrendingPost[] = [
     comments: 178,
     shares: 440,
     tag: "#LocalFood",
-    tagColor: "hot",
+    tagColor: "event",
     timeAgo: "3h",
   },
 ];
 
-const TAG_COLORS = {
-  urgent: "text-white bg-red-500 border-red-500",
-  warning: "text-white bg-orange-400 border-orange-400",
-  nonurgent: "text-gray-700 bg-gray-300 border-gray-300",
-  note: "text-white bg-purple-400 border-purple-400",
-  event: "text-white bg-pink-400 border-pink-400",
-  active: "text-white bg-green-500 border-green-500",
-  inactive: "text-gray-700 bg-gray-300 border-gray-300",
+const TAG_COLORS: Record<string, string> = {
+  urgent:    "tag-urgent",
+  warning:   "tag-warning",
+  nonurgent: "tag-nonurgent",
+  safety:    "tag-safety",
+  note:      "tag-note",
+  event:     "tag-event",
+  weather:   "tag-weather",
 };
 
-const AVATAR_COLORS = {
-  urgent: "bg-red-100 text-red-700 border border-red-300",
-  warning: "bg-orange-100 text-orange-700 border border-orange-300",
-  nonurgent: "bg-gray-100 text-gray-700 border border-gray-300",
-  note: "bg-purple-100 text-purple-700 border border-purple-300",
-  event: "bg-pink-100 text-pink-700 border border-pink-300",
-  active: "bg-green-100 text-green-700 border border-green-300",
-  inactive: "bg-gray-100 text-gray-700 border border-gray-300",
+const AVATAR_COLORS: Record<string, string> = {
+  urgent:    "tag-urgent",
+  warning:   "tag-warning",
+  nonurgent: "tag-nonurgent",
+  safety:    "tag-safety",
+  note:      "tag-note",
+  event:     "tag-event",
+  weather:   "tag-weather",
 };
 
 function formatNumber(n: number): string {

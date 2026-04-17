@@ -117,14 +117,55 @@
   }
 }
 
+/* ── Tag color system (source of truth) ───────────────────────────────────── */
+:root {
+  /* Base accent (used for outlines, map pins, and solid buttons) */
+  --tag-safety:    #f97316; /* orange-500 */
+  --tag-event:     #14b8a6; /* teal-500   */
+  --tag-note:      #6b7280; /* gray-500   */
+  --tag-urgent:    #ef4444; /* red-500    */
+  --tag-warning:   #eab308; /* yellow-500 */
+  --tag-nonurgent: #6b7280; /* gray-500   */
+  --tag-weather:   #6b7280; /* gray-500   */
+
+  /* Light variant (bg / text / border) */
+  --tag-safety-bg:      #fff7ed; --tag-safety-fg:      #9a3412; --tag-safety-border:      #fdba74;
+  --tag-event-bg:       #f0fdfa; --tag-event-fg:       #0f766e; --tag-event-border:       #5eead4;
+  --tag-note-bg:        #f3f4f6; --tag-note-fg:        #374151; --tag-note-border:        #d1d5db;
+  --tag-urgent-bg:      #fee2e2; --tag-urgent-fg:      #b91c1c; --tag-urgent-border:      #fca5a5;
+  --tag-warning-bg:     #fef9c3; --tag-warning-fg:     #92400e; --tag-warning-border:     #fde68a;
+  --tag-nonurgent-bg:   #f3f4f6; --tag-nonurgent-fg:   #374151; --tag-nonurgent-border:   #d1d5db;
+  --tag-weather-bg:     #f3f4f6; --tag-weather-fg:     #374151; --tag-weather-border:     #d1d5db;
+}
+
+/* Light pill — card previews, map tooltip, sidebar badges */
+.tag-safety    { background-color: var(--tag-safety-bg);    color: var(--tag-safety-fg);    border: 1px solid var(--tag-safety-border); }
+.tag-event     { background-color: var(--tag-event-bg);     color: var(--tag-event-fg);     border: 1px solid var(--tag-event-border); }
+.tag-note      { background-color: var(--tag-note-bg);      color: var(--tag-note-fg);      border: 1px solid var(--tag-note-border); }
+.tag-urgent    { background-color: var(--tag-urgent-bg);    color: var(--tag-urgent-fg);    border: 1px solid var(--tag-urgent-border); }
+.tag-warning   { background-color: var(--tag-warning-bg);   color: var(--tag-warning-fg);   border: 1px solid var(--tag-warning-border); }
+.tag-nonurgent { background-color: var(--tag-nonurgent-bg); color: var(--tag-nonurgent-fg); border: 1px solid var(--tag-nonurgent-border); }
+.tag-weather   { background-color: var(--tag-weather-bg);   color: var(--tag-weather-fg);   border: 1px solid var(--tag-weather-border); }
+
+/* Outline pill — inactive/unselected button state */
+.tag-outline-safety    { color: var(--tag-safety);    border: 1px solid var(--tag-safety);    background: transparent; }
+.tag-outline-event     { color: var(--tag-event);     border: 1px solid var(--tag-event);     background: transparent; }
+.tag-outline-note      { color: var(--tag-note);      border: 1px solid var(--tag-note);      background: transparent; }
+.tag-outline-urgent    { color: var(--tag-urgent);    border: 1px solid var(--tag-urgent);    background: transparent; }
+.tag-outline-warning   { color: var(--tag-warning);   border: 1px solid var(--tag-warning);   background: transparent; }
+.tag-outline-nonurgent { color: var(--tag-nonurgent); border: 1px solid var(--tag-nonurgent); background: transparent; }
+.tag-outline-weather   { color: var(--tag-weather);   border: 1px solid var(--tag-weather);   background: transparent; }
+/* ── End tag color system ─────────────────────────────────────────────────── */
+
 .leaflet-tooltip.custom-tooltip {
   background: white;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 8px 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   font-family: system-ui, -apple-system, sans-serif;
-  max-width: 250px;
+  max-width: 290px;
+  pointer-events: none;
 }
 
 .leaflet-tooltip.custom-tooltip::before {
