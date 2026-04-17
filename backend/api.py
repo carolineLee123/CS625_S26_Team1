@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify
 from flask_cors import CORS
 from database import DatabaseManager
 import os
@@ -64,6 +64,7 @@ def get_report(report_id):
             'error': str(e)
         }), 500
 
+<<<<<<< HEAD
 @app.route('/api/reports', methods=['POST'])
 def create_report():
     """Create a new report"""
@@ -138,6 +139,8 @@ def create_report():
             'error': str(e)
         }), 500
 
+=======
+>>>>>>> parent of a9dedf4 (Merge pull request #9 from carolineLee123/create_report)
 if __name__ == '__main__':
     port = int(os.getenv('API_PORT', 5001))
     app.run(debug=True, host='0.0.0.0', port=port)

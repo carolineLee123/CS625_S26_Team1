@@ -56,37 +56,3 @@ export async function fetchReport(id: number): Promise<Report | null> {
     return null;
   }
 }
-
-export interface CreateReportData {
-  title: string;
-  location: string;
-  category: 'Safety' | 'Event' | 'Note';
-  description: string;
-  urgency?: 'Urgent' | 'Warning' | 'Non-urgent';
-  latitude?: number;
-  longitude?: number;
-  user_id?: number;
-}
-
-export async function createReport(data: CreateReportData): Promise<Report | null> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/reports`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    const result: ApiResponse<Report> = await response.json();
-
-    if (!response.ok || !result.success) {
-      throw new Error(result.error || 'Failed to create report');
-    }
-
-    return result.data || null;
-  } catch (error) {
-    console.error('Error creating report:', error);
-    return null;
-  }
-}
