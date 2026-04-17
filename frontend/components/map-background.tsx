@@ -168,7 +168,7 @@ export function MapBackground({
                 ${pin.urgency ? `<span class="tp-tag ${urgencyClass}">${pin.urgency}</span>` : ''}
                 ${categoryLabel ? `<span class="tp-tag ${catClass}">${categoryLabel}</span>` : ''}
               </div>
-              ${pin.location ? `<div class="tp-location">📍 ${pin.location}</div>` : ''}
+              ${pin.location ? `<div class="tp-location">${pin.location}</div>` : ''}
               ${statusDateLine ? `<div class="tp-meta">${statusDateLine}</div>` : ''}
               ${verifiedLine}
               ${truncDesc ? `<p class="tp-desc">${truncDesc}</p>` : ''}
