@@ -2,6 +2,11 @@ from database import DatabaseManager
 import mysql.connector
 from mysql.connector import Error
 
+"""
+Clean DB and add seed data from Boston and Amherst
+(user_id, lat, lng, title, description, category, safety_level, likes, comments, shares, verified_count)
+"""
+
 def clear_and_add_boston_reports():
     """Clear existing reports and add Boston-based reports"""
     db = DatabaseManager()
