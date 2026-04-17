@@ -147,7 +147,7 @@ export function MapBackground({
           }
 
           const statusClass = pin.status === 'open' ? 'status-active' : 'status-inactive'
-          const metaLine = (statusLabel || dateLabel)
+          const statusDateLine = (statusLabel || dateLabel)
             ? `<span class="${statusClass}">${statusLabel}</span>${dateLabel ? `<span class="status-inactive"> · ${dateLabel}</span>` : ''}`
             : ''
           const verifiedLine = typeof pin.verifiedCount === 'number'
@@ -158,7 +158,7 @@ export function MapBackground({
             : ''
 
           const truncDesc = pin.description
-            ? pin.description.substring(0, 160) + (pin.description.length > 160 ? '…' : '')
+            ? pin.description.substring(0, 70) + (pin.description.length > 70 ? '…' : '')
             : ''
 
           const tooltipContent = `
@@ -169,7 +169,7 @@ export function MapBackground({
                 ${categoryLabel ? `<span class="tp-tag ${catClass}">${categoryLabel}</span>` : ''}
               </div>
               ${pin.location ? `<div class="tp-location">📍 ${pin.location}</div>` : ''}
-              ${metaLine ? `<div class="tp-meta">${metaLine}</div>` : ''}
+              ${statusDateLine ? `<div class="tp-meta">${statusDateLine}</div>` : ''}
               ${verifiedLine}
               ${truncDesc ? `<p class="tp-desc">${truncDesc}</p>` : ''}
               <div class="tp-cta">Click to read more</div>
