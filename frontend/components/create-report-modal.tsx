@@ -15,32 +15,31 @@ type Urgency = 'Non-urgent' | 'Warning' | 'Urgent';
 type Step = 'form' | 'preview' | 'confirmed';
 
 const CATEGORIES: { label: Category; color: string; active: string }[] = [
-  { label: 'Safety', color: 'border-orange-300 text-orange-600', active: 'bg-orange-500 border-orange-500 text-white' },
-  { label: 'Event',  color: 'border-teal-300 text-teal-600',     active: 'bg-teal-500 border-teal-500 text-white' },
-  { label: 'Note',   color: 'border-gray-300 text-gray-600',     active: 'bg-gray-500 border-gray-500 text-white' },
+  { label: 'Safety', color: 'tag-outline-safety',    active: 'tag-solid-safety' },
+  { label: 'Event',  color: 'tag-outline-event',     active: 'tag-solid-event' },
+  { label: 'Note',   color: 'tag-outline-note',      active: 'tag-solid-note' },
 ];
 
 const URGENCY_LEVELS: { label: Urgency; color: string; active: string }[] = [
-  { label: 'Non-urgent', color: 'border-gray-300 text-gray-600',     active: 'bg-gray-500 border-gray-500 text-white' },
-  { label: 'Warning',    color: 'border-yellow-300 text-yellow-600', active: 'bg-yellow-500 border-yellow-500 text-white' },
-  { label: 'Urgent',     color: 'border-red-300 text-red-600',       active: 'bg-red-500 border-red-500 text-white' },
+  { label: 'Non-urgent', color: 'tag-outline-nonurgent', active: 'tag-solid-nonurgent' },
+  { label: 'Warning',    color: 'tag-outline-warning',   active: 'tag-solid-warning' },
+  { label: 'Urgent',     color: 'tag-outline-urgent',    active: 'tag-solid-urgent' },
 ];
 
-// Maps category + urgency to the sidebar's tagColor system
 const TAG_COLORS = {
-  urgent:    'text-white bg-red-500 border-red-500',
-  warning:   'text-white bg-orange-400 border-orange-400',
-  nonurgent: 'text-gray-700 bg-gray-300 border-gray-300',
-  event:     'text-white bg-pink-400 border-pink-400',
-  note:      'text-white bg-purple-400 border-purple-400',
+  urgent:    'tag-urgent',
+  warning:   'tag-warning',
+  nonurgent: 'tag-nonurgent',
+  event:     'tag-event',
+  note:      'tag-note',
 };
 
 const AVATAR_COLORS = {
-  urgent:    'bg-red-100 text-red-700 border border-red-300',
-  warning:   'bg-orange-100 text-orange-700 border border-orange-300',
-  nonurgent: 'bg-gray-100 text-gray-700 border border-gray-300',
-  event:     'bg-pink-100 text-pink-700 border border-pink-300',
-  note:      'bg-purple-100 text-purple-700 border border-purple-300',
+  urgent:    'tag-urgent',
+  warning:   'tag-warning',
+  nonurgent: 'tag-nonurgent',
+  event:     'tag-event',
+  note:      'tag-note',
 };
 
 function getTagKey(category: Category | null, urgency: Urgency | null) {
@@ -279,20 +278,17 @@ export function CreateReportModal({ open, onClose }: CreateReportModalProps) {
                 </span>
                 {urgency && urgency !== 'Non-urgent' && (
                   <span className={cn(
-                    'rounded-full px-3 py-0.5 text-xs font-semibold border',
-                    urgency === 'Urgent'
-                      ? 'bg-red-100 text-red-700 border-red-200'
-                      : 'bg-yellow-100 text-yellow-700 border-yellow-200'
+                    'rounded-full px-3 py-0.5 text-xs font-semibold',
+                    urgency === 'Urgent' ? 'tag-urgent' : 'tag-warning'
                   )}>
                     {urgency}
                   </span>
                 )}
                 {category && (
                   <span className={cn(
-                    'rounded-full px-3 py-0.5 text-xs font-semibold border',
-                    category === 'Safety' ? 'bg-orange-100 text-orange-700 border-orange-200' :
-                    category === 'Note'   ? 'bg-purple-100 text-purple-700 border-purple-200' :
-                                           'bg-teal-100 text-teal-700 border-teal-200'
+                    'rounded-full px-3 py-0.5 text-xs font-semibold',
+                    category === 'Safety' ? 'tag-safety' :
+                    category === 'Note'   ? 'tag-note'   : 'tag-event'
                   )}>
                     {category}
                   </span>

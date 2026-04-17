@@ -13,6 +13,11 @@ export interface MapPin {
   description?: string
   category?: string
   safetyLevel?: string
+  urgency?: string
+  location?: string
+  status?: string
+  createdAt?: string
+  verifiedCount?: number
 }
 
 interface MapBackgroundProps {
@@ -31,6 +36,7 @@ export function MapBackground({
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<any>(null)
   const markersRef = useRef<{ [key: string]: any }>({})
+  const tooltipDataRef = useRef<{ [key: string]: { content: string; rich: boolean } }>({})
   const [mapReady, setMapReady] = useState(false)
 
   useEffect(() => {
@@ -95,22 +101,7 @@ export function MapBackground({
       pins.forEach((pin) => {
         console.log('Adding pin:', pin.id, 'at', pin.lat, pin.lng);
         const html = `
-          <div style="
-            width: 40px;
-            height: 40px;
-            background: ${pin.color};
-            border: 3px solid white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: white;
-            font-size: 18px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-            transition: all 0.2s;
-          " class="map-pin-${pin.id}">
+          <div class="map-pin map-pin-${pin.id}" style="background:${pin.color};">
             ${pin.number}
           </div>
         `
@@ -130,26 +121,74 @@ export function MapBackground({
 
         // Add tooltip with report information
         if (pin.description || pin.category || pin.safetyLevel) {
+          const urgencyClass = pin.urgency === 'Urgent' ? 'tag-urgent'
+            : pin.urgency === 'Warning' ? 'tag-warning'
+            : 'tag-nonurgent'
+
+          const categoryClassMap: Record<string, string> = {
+            safety: 'tag-safety', event: 'tag-event', note: 'tag-note', weather: 'tag-weather',
+          }
+          const catClass = pin.category ? (categoryClassMap[pin.category.toLowerCase()] ?? 'tag-note') : ''
+          const categoryLabel = pin.category
+            ? pin.category.charAt(0).toUpperCase() + pin.category.slice(1)
+            : ''
+
+          const statusLabel = pin.status === 'open' ? 'Active'
+            : pin.status === 'in_progress' ? 'In Progress'
+            : pin.status === 'resolved' ? 'Resolved'
+            : pin.status === 'closed' ? 'Inactive'
+            : pin.status ?? ''
+
+          let dateLabel = ''
+          if (pin.createdAt) {
+            const d = new Date(pin.createdAt)
+            const days = ['SUN','MON','TUE','WED','THU','FRI','SAT']
+            dateLabel = `${days[d.getDay()]} ${d.getMonth() + 1}/${d.getDate()}`
+          }
+
+          const statusClass = pin.status === 'open' ? 'status-active' : 'status-inactive'
+          const statusDateLine = (statusLabel || dateLabel)
+            ? `<span class="${statusClass}">${statusLabel}</span>${dateLabel ? `<span class="status-inactive"> · ${dateLabel}</span>` : ''}`
+            : ''
+          const verifiedLine = typeof pin.verifiedCount === 'number'
+            ? `<div class="tp-verified">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                ${pin.verifiedCount > 5 ? `>5` : pin.verifiedCount} member${pin.verifiedCount === 1 ? '' : 's'} verified this report
+              </div>`
+            : ''
+
+          const truncDesc = pin.description
+            ? pin.description.substring(0, 70) + (pin.description.length > 70 ? '…' : '')
+            : ''
+
           const tooltipContent = `
-            <div style="font-family: system-ui, -apple-system, sans-serif;">
-              <strong style="display: block; margin-bottom: 4px; font-size: 13px;">${pin.title}</strong>
-              ${pin.description ? `<p style="margin: 0 0 4px 0; font-size: 12px; color: #555;">${pin.description.substring(0, 100)}${pin.description.length > 100 ? '...' : ''}</p>` : ''}
-              ${pin.category ? `<span style="display: inline-block; background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-size: 11px; margin-right: 4px;">${pin.category}</span>` : ''}
-              ${pin.safetyLevel ? `<span style="display: inline-block; background: ${pin.color}; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">${pin.safetyLevel}</span>` : ''}
+            <div class="tp-card">
+              <h3 class="tp-title">${pin.title}</h3>
+              <div class="tp-tags">
+                ${pin.urgency ? `<span class="tp-tag ${urgencyClass}">${pin.urgency}</span>` : ''}
+                ${categoryLabel ? `<span class="tp-tag ${catClass}">${categoryLabel}</span>` : ''}
+              </div>
+              ${pin.location ? `<div class="tp-location">${pin.location}</div>` : ''}
+              ${statusDateLine ? `<div class="tp-meta">${statusDateLine}</div>` : ''}
+              ${verifiedLine}
+              ${truncDesc ? `<p class="tp-desc">${truncDesc}</p>` : ''}
+              <div class="tp-cta">Click to read more</div>
             </div>
           `
 
           marker.bindTooltip(tooltipContent, {
             direction: 'top',
             offset: [0, -20],
-            opacity: 0.95,
+            opacity: 1,
             className: 'custom-tooltip'
           })
+          tooltipDataRef.current[pin.id] = { content: tooltipContent, rich: true }
         } else {
           marker.bindTooltip(pin.title, {
             direction: 'top',
             offset: [0, -20],
           })
+          tooltipDataRef.current[pin.id] = { content: pin.title, rich: false }
         }
 
         markersRef.current[pin.id] = marker
@@ -160,15 +199,35 @@ export function MapBackground({
   }, [pins, onPinClick, mapReady])
 
   useEffect(() => {
-    Object.entries(markersRef.current).forEach(([pinId]) => {
+    Object.entries(markersRef.current).forEach(([pinId, marker]) => {
+      const isPinned = pinId === selectedPinId
       const pinEl = document.querySelector(`.map-pin-${pinId}`) as HTMLElement | null
       if (pinEl) {
-        if (pinId === selectedPinId) {
-          pinEl.style.transform = "scale(1.3)"
-          pinEl.style.zIndex = "1000"
-        } else {
-          pinEl.style.transform = "scale(1)"
-          pinEl.style.zIndex = "999"
+        pinEl.style.transform = isPinned ? "scale(1.3)" : "scale(1)"
+        pinEl.style.zIndex = isPinned ? "1000" : "999"
+      }
+
+      // Disable hover events on the selected pin's marker so the permanent
+      // card doesn't flicker and cursor-over-card doesn't retrigger it.
+      const markerEl = marker.getElement() as HTMLElement | undefined
+      if (markerEl) markerEl.style.pointerEvents = isPinned ? 'none' : 'auto'
+
+      const data = tooltipDataRef.current[pinId]
+      if (data) {
+        marker.unbindTooltip()
+        marker.bindTooltip(data.content, {
+          direction: 'top',
+          offset: [0, -20],
+          opacity: 1,
+          ...(data.rich ? { className: 'custom-tooltip' } : {}),
+          permanent: isPinned,
+        })
+        if (isPinned) {
+          marker.openTooltip()
+          // Inline style beats Leaflet's stylesheet — card blocks mouse events
+          // so pins underneath can't trigger hover tooltips
+          const tooltipEl = marker.getTooltip()?.getElement() as HTMLElement | undefined
+          if (tooltipEl) tooltipEl.style.pointerEvents = 'auto'
         }
       }
     })
