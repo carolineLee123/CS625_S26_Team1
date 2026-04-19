@@ -122,6 +122,7 @@ export default function Page() {
   const loadReports = useCallback(async () => {
     setLoading(true);
     const reports = await fetchReports();
+    console.log(reports);
 
     const convertedPins = reports.map(report => convertReportToPin(report));
     setPins(convertedPins);
@@ -234,6 +235,17 @@ export default function Page() {
     } catch (error) {
       console.error("Location search failed:", error);
     }
+  }, []);
+
+  
+  const handleMapClick = useCallback((lat: number, lng: number) => {
+    setClickedCoords({ lat, lng });
+    setCreateOpen(true);
+  }, []);
+
+  const handleCreateClose = useCallback(() => {
+    setCreateOpen(false);
+    setClickedCoords(null);
   }, []);
 
   return (
