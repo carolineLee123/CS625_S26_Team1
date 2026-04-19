@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, ImagePlus, Navigation, CheckCircle2, Hash, Heart, MessageCircle, Share2, Calendar, User, BadgeCheck } from 'lucide-react';
 import {
   Dialog,
@@ -9,38 +9,38 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { createReport } from '@/lib/api';
 
 type Category = 'Safety' | 'Event' | 'Note';
 type Urgency = 'Non-urgent' | 'Warning' | 'Urgent';
 type Step = 'form' | 'preview' | 'confirmed';
 
 const CATEGORIES: { label: Category; color: string; active: string }[] = [
-  { label: 'Safety', color: 'border-orange-300 text-orange-600', active: 'bg-orange-500 border-orange-500 text-white' },
-  { label: 'Event',  color: 'border-teal-300 text-teal-600',     active: 'bg-teal-500 border-teal-500 text-white' },
-  { label: 'Note',   color: 'border-gray-300 text-gray-600',     active: 'bg-gray-500 border-gray-500 text-white' },
+  { label: 'Safety', color: 'tag-outline-safety',    active: 'tag-solid-safety' },
+  { label: 'Event',  color: 'tag-outline-event',     active: 'tag-solid-event' },
+  { label: 'Note',   color: 'tag-outline-note',      active: 'tag-solid-note' },
 ];
 
 const URGENCY_LEVELS: { label: Urgency; color: string; active: string }[] = [
-  { label: 'Non-urgent', color: 'border-gray-300 text-gray-600',     active: 'bg-gray-500 border-gray-500 text-white' },
-  { label: 'Warning',    color: 'border-yellow-300 text-yellow-600', active: 'bg-yellow-500 border-yellow-500 text-white' },
-  { label: 'Urgent',     color: 'border-red-300 text-red-600',       active: 'bg-red-500 border-red-500 text-white' },
+  { label: 'Non-urgent', color: 'tag-outline-nonurgent', active: 'tag-solid-nonurgent' },
+  { label: 'Warning',    color: 'tag-outline-warning',   active: 'tag-solid-warning' },
+  { label: 'Urgent',     color: 'tag-outline-urgent',    active: 'tag-solid-urgent' },
 ];
 
-// Maps category + urgency to the sidebar's tagColor system
 const TAG_COLORS = {
-  urgent:    'text-white bg-red-500 border-red-500',
-  warning:   'text-white bg-orange-400 border-orange-400',
-  nonurgent: 'text-gray-700 bg-gray-300 border-gray-300',
-  event:     'text-white bg-pink-400 border-pink-400',
-  note:      'text-white bg-purple-400 border-purple-400',
+  urgent:    'tag-urgent',
+  warning:   'tag-warning',
+  nonurgent: 'tag-nonurgent',
+  event:     'tag-event',
+  note:      'tag-note',
 };
 
 const AVATAR_COLORS = {
-  urgent:    'bg-red-100 text-red-700 border border-red-300',
-  warning:   'bg-orange-100 text-orange-700 border border-orange-300',
-  nonurgent: 'bg-gray-100 text-gray-700 border border-gray-300',
-  event:     'bg-pink-100 text-pink-700 border border-pink-300',
-  note:      'bg-purple-100 text-purple-700 border border-purple-300',
+  urgent:    'tag-urgent',
+  warning:   'tag-warning',
+  nonurgent: 'tag-nonurgent',
+  event:     'tag-event',
+  note:      'tag-note',
 };
 
 function getTagKey(category: Category | null, urgency: Urgency | null) {
@@ -71,9 +71,13 @@ function getTagLabel(category: Category | null, urgency: Urgency | null) {
 interface CreateReportModalProps {
   open: boolean;
   onClose: () => void;
+  onReportCreated?: () => void;
+  initialLatitude?: number;
+  initialLongitude?: number;
+  initialLocation?: string;
 }
 
-export function CreateReportModal({ open, onClose }: CreateReportModalProps) {
+export function CreateReportModal({ open, onClose, onReportCreated, initialLatitude, initialLongitude, initialLocation }: CreateReportModalProps) {
   const [step, setStep] = useState<Step>('form');
   const [title, setTitle] = useState('');
   const [location, setLocation] = useState('');
@@ -81,6 +85,9 @@ export function CreateReportModal({ open, onClose }: CreateReportModalProps) {
   const [description, setDescription] = useState('');
   const [urgency, setUrgency] = useState<Urgency | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [clickedLat, setClickedLat] = useState<number | undefined>(initialLatitude);
+  const [clickedLng, setClickedLng] = useState<number | undefined>(initialLongitude);
 
   function handleClose() {
     onClose();
@@ -96,6 +103,67 @@ export function CreateReportModal({ open, onClose }: CreateReportModalProps) {
     setDescription('');
     setUrgency(null);
     setPhotos([]);
+    setIsSubmitting(false);
+    setClickedLat(undefined);
+    setClickedLng(undefined);
+  }
+
+  useEffect(() => {
+    if (open && initialLatitude && initialLongitude) {
+      setClickedLat(initialLatitude);
+      setClickedLng(initialLongitude);
+      if (initialLocation) {
+        setLocation(initialLocation);
+      } else {
+        setLocation(`${initialLatitude.toFixed(4)}, ${initialLongitude.toFixed(4)}`);
+      }
+    }
+  }, [open, initialLatitude, initialLongitude, initialLocation]);
+
+  async function handleSubmit() {
+    if (!category) return;
+
+    setIsSubmitting(true);
+
+    try {
+      // Use clicked coordinates if available, otherwise get current location or default
+      let latitude = clickedLat || 42.3601;
+      let longitude = clickedLng || -71.0589;
+
+      if (!clickedLat && !clickedLng && location === 'Current Location' && navigator.geolocation) {
+        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        });
+        latitude = position.coords.latitude;
+        longitude = position.coords.longitude;
+      }
+
+      const reportData = {
+        title,
+        location,
+        category,
+        description,
+        urgency: category === 'Safety' ? (urgency ?? undefined) : undefined,
+        latitude,
+        longitude,
+      };
+
+      const newReport = await createReport(reportData);
+
+      if (newReport) {
+        setStep('confirmed');
+        if (onReportCreated) {
+          onReportCreated();
+        }
+      } else {
+        alert('Failed to create report. Please try again.');
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      console.error('Error submitting report:', error);
+      alert('Failed to create report. Please try again.');
+      setIsSubmitting(false);
+    }
   }
 
   function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -156,6 +224,11 @@ export function CreateReportModal({ open, onClose }: CreateReportModalProps) {
               {location === 'Current Location' && (
                 <span className="flex items-center gap-1 text-xs text-blue-500 mt-0.5">
                   <MapPin size={11} /> Using your current location
+                </span>
+              )}
+              {clickedLat && clickedLng && location !== 'Current Location' && (
+                <span className="flex items-center gap-1 text-xs text-green-600 mt-0.5">
+                  <MapPin size={11} /> Location from map click: {clickedLat.toFixed(4)}, {clickedLng.toFixed(4)}
                 </span>
               )}
             </div>
@@ -279,20 +352,17 @@ export function CreateReportModal({ open, onClose }: CreateReportModalProps) {
                 </span>
                 {urgency && urgency !== 'Non-urgent' && (
                   <span className={cn(
-                    'rounded-full px-3 py-0.5 text-xs font-semibold border',
-                    urgency === 'Urgent'
-                      ? 'bg-red-100 text-red-700 border-red-200'
-                      : 'bg-yellow-100 text-yellow-700 border-yellow-200'
+                    'rounded-full px-3 py-0.5 text-xs font-semibold',
+                    urgency === 'Urgent' ? 'tag-urgent' : 'tag-warning'
                   )}>
                     {urgency}
                   </span>
                 )}
                 {category && (
                   <span className={cn(
-                    'rounded-full px-3 py-0.5 text-xs font-semibold border',
-                    category === 'Safety' ? 'bg-orange-100 text-orange-700 border-orange-200' :
-                    category === 'Note'   ? 'bg-purple-100 text-purple-700 border-purple-200' :
-                                           'bg-teal-100 text-teal-700 border-teal-200'
+                    'rounded-full px-3 py-0.5 text-xs font-semibold',
+                    category === 'Safety' ? 'tag-safety' :
+                    category === 'Note'   ? 'tag-note'   : 'tag-event'
                   )}>
                     {category}
                   </span>
@@ -375,10 +445,16 @@ export function CreateReportModal({ open, onClose }: CreateReportModalProps) {
             </button>
             <button
               type="button"
-              onClick={() => setStep('confirmed')}
-              className="rounded-lg px-5 py-2 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 active:scale-95 transition-all"
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className={cn(
+                "rounded-lg px-5 py-2 text-sm font-semibold transition-all",
+                isSubmitting
+                  ? "bg-gray-400 text-white cursor-not-allowed"
+                  : "bg-blue-500 text-white hover:bg-blue-600 active:scale-95"
+              )}
             >
-              Submit Report
+              {isSubmitting ? 'Submitting...' : 'Submit Report'}
             </button>
           </div>
         </DialogContent>

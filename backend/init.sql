@@ -15,10 +15,15 @@ CREATE TABLE IF NOT EXISTS reports (
     user_id INT NOT NULL,
     latitude DECIMAL(10, 8) NOT NULL,
     longitude DECIMAL(11, 8) NOT NULL,
+    title VARCHAR(200) NOT NULL,
     description TEXT NOT NULL,
-    category ENUM('safety', 'maintenance', 'environmental', 'infrastructure', 'emergency', 'other') NOT NULL,
+    category ENUM('safety', 'event','note') NOT NULL,
     safety_level ENUM('low', 'medium', 'high', 'critical') NOT NULL,
     status ENUM('open', 'in_progress', 'resolved', 'closed') DEFAULT 'open',
+    likes INT DEFAULT 0,
+    comments INT DEFAULT 0,
+    shares INT DEFAULT 0,
+    verified_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id),
@@ -34,9 +39,3 @@ INSERT INTO users (username, email) VALUES
 ('admin', 'admin@example.com')
 ON DUPLICATE KEY UPDATE username=username;
 
--- Insert sample reports
-INSERT INTO reports (user_id, latitude, longitude, description, category, safety_level) VALUES
-(1, 37.7749, -122.4194, 'Pothole on main street causing traffic issues', 'infrastructure', 'medium'),
-(1, 37.7849, -122.4094, 'Broken streetlight in park area', 'safety', 'high'),
-(2, 37.7649, -122.4294, 'Fallen tree blocking sidewalk after storm', 'environmental', 'high')
-ON DUPLICATE KEY UPDATE description=description;

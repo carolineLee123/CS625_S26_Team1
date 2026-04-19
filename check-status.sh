@@ -30,9 +30,9 @@ echo "Flask API:"
 if pgrep -f "python api.py" >/dev/null; then
     echo "  Status: Running"
     echo "  PID: $(pgrep -f "python api.py")"
-    if curl -s http://localhost:5000/api/health >/dev/null 2>&1; then
+    if curl -s http://localhost:5001/api/health >/dev/null 2>&1; then
         echo "  Health: OK"
-        echo "  URL: http://localhost:5000"
+        echo "  URL: http://localhost:5001"
     else
         echo "  Health: Not responding"
     fi

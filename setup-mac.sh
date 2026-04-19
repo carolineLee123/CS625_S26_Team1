@@ -173,7 +173,7 @@ fi
 if [ ! -f "frontend/.env.local" ]; then
     print_info "Creating frontend .env.local file..."
     cat > frontend/.env.local << 'EOF'
-NEXT_PUBLIC_API_URL=http://localhost:5000
+NEXT_PUBLIC_API_URL=http://localhost:5001
 EOF
     print_success "Frontend .env.local file created"
 else
@@ -248,7 +248,7 @@ docker compose up -d
 sleep 5
 
 # Start Flask API in background
-echo "Starting Flask API on http://localhost:5000..."
+echo "Starting Flask API on http://localhost:5001..."
 source venv/bin/activate
 cd backend
 nohup python api.py > /tmp/flask_api.log 2>&1 &
@@ -273,7 +273,7 @@ echo "All services started successfully!"
 echo "=========================================="
 echo ""
 echo "Frontend: http://localhost:3000"
-echo "Backend API: http://localhost:5000/api/reports"
+echo "Backend API: http://localhost:5001/api/reports"
 echo ""
 echo "To view logs:"
 echo "  Flask API: tail -f /tmp/flask_api.log"
@@ -350,9 +350,9 @@ echo "Flask API:"
 if pgrep -f "python api.py" >/dev/null; then
     echo "  Status: Running"
     echo "  PID: $(pgrep -f "python api.py")"
-    if curl -s http://localhost:5000/api/health >/dev/null 2>&1; then
+    if curl -s http://localhost:5001/api/health >/dev/null 2>&1; then
         echo "  Health: OK"
-        echo "  URL: http://localhost:5000"
+        echo "  URL: http://localhost:5001"
     else
         echo "  Health: Not responding"
     fi

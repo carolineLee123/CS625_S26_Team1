@@ -102,9 +102,10 @@ class DatabaseManager:
         try:
             cursor = self.connection.cursor(dictionary=True)
             query = """
-            SELECT r.id, r.latitude, r.longitude, r.description,
+            SELECT r.id, r.title, r.latitude, r.longitude, r.description,
                    r.category, r.safety_level, r.status, r.created_at,
-                   r.updated_at, u.username
+                   r.updated_at, r.likes, r.comments, r.shares, r.verified_count,
+                   u.username
             FROM reports r
             JOIN users u ON r.user_id = u.id
             ORDER BY r.created_at DESC
@@ -133,9 +134,10 @@ class DatabaseManager:
         try:
             cursor = self.connection.cursor(dictionary=True)
             query = """
-            SELECT r.id, r.latitude, r.longitude, r.description,
+            SELECT r.id, r.title, r.latitude, r.longitude, r.description,
                    r.category, r.safety_level, r.status, r.created_at,
-                   r.updated_at, u.username
+                   r.updated_at, r.likes, r.comments, r.shares, r.verified_count,
+                   u.username
             FROM reports r
             JOIN users u ON r.user_id = u.id
             WHERE r.id = %s
@@ -175,6 +177,50 @@ class DatabaseManager:
         except Error as e:
             print(f"[ERROR] Error adding report: {e}")
             return False
+
+    def create_report(self, user_id, latitude, longitude, title, description, category, safety_level, location_text=None):
+        """Create a new report"""
+        if not self.connection or not self.connection.is_connected():
+            if not self.connect():
+                return None
+
+        try:
+            cursor = self.connection.cursor(dictionary=True)
+
+            query = """
+            INSERT INTO reports (user_id, latitude, longitude, title, description, category, safety_level, status)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, 'open')
+            """
+            cursor.execute(query, (user_id, latitude, longitude, title, description, category, safety_level))
+            self.connection.commit()
+
+            report_id = cursor.lastrowid
+            print(f"[SUCCESS] Created new report with ID: {report_id}")
+
+            # Fetch the newly created report
+            cursor.execute("""
+                SELECT r.id, r.latitude, r.longitude, r.description,
+                       r.category, r.safety_level, r.status, r.created_at,
+                       r.updated_at, r.likes, r.comments, r.shares, r.verified_count,
+                       u.username
+                FROM reports r
+                JOIN users u ON r.user_id = u.id
+                WHERE r.id = %s
+            """, (report_id,))
+
+            report = cursor.fetchone()
+            cursor.close()
+
+            if report:
+                report['latitude'] = float(report['latitude'])
+                report['longitude'] = float(report['longitude'])
+                report['created_at'] = report['created_at'].isoformat() if report['created_at'] else None
+                report['updated_at'] = report['updated_at'].isoformat() if report['updated_at'] else None
+
+            return report
+        except Error as e:
+            print(f"[ERROR] Error creating report: {e}")
+            return None
 
     def close(self):
         """Close database connection"""

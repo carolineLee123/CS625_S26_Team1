@@ -117,16 +117,116 @@
   }
 }
 
+/*Tag color system */
+:root {
+  /* Base accent (used for outlines, map pins, and solid buttons) */
+  --tag-safety:    #f97316; /* orange-500 */
+  --tag-event:     #14b8a6; /* teal-500   */
+  --tag-note:      #6b7280; /* gray-500   */
+  --tag-urgent:    #ef4444; /* red-500    */
+  --tag-warning:   #eab308; /* yellow-500 */
+  --tag-nonurgent: #6b7280; /* gray-500   */
+  --tag-weather:   #6b7280; /* gray-500   */
+
+  /* Light variant (bg / text / border) */
+  --tag-safety-bg:      #fff7ed; --tag-safety-fg:      #9a3412; --tag-safety-border:      #fdba74;
+  --tag-event-bg:       #f0fdfa; --tag-event-fg:       #0f766e; --tag-event-border:       #5eead4;
+  --tag-note-bg:        #f3f4f6; --tag-note-fg:        #374151; --tag-note-border:        #d1d5db;
+  --tag-urgent-bg:      #fee2e2; --tag-urgent-fg:      #b91c1c; --tag-urgent-border:      #fca5a5;
+  --tag-warning-bg:     #fef9c3; --tag-warning-fg:     #92400e; --tag-warning-border:     #fde68a;
+  --tag-nonurgent-bg:   #e1e2e4; --tag-nonurgent-fg:   #374151; --tag-nonurgent-border:   #d1d5db;
+  --tag-weather-bg:     #f3f4f6; --tag-weather-fg:     #374151; --tag-weather-border:     #d1d5db;
+}
+
+/* Light pill — card previews, map tooltip, sidebar badges */
+.tag-safety    { background-color: var(--tag-safety-bg);    color: var(--tag-safety-fg);    border: 1px solid var(--tag-safety-border); }
+.tag-event     { background-color: var(--tag-event-bg);     color: var(--tag-event-fg);     border: 1px solid var(--tag-event-border); }
+.tag-note      { background-color: var(--tag-note-bg);      color: var(--tag-note-fg);      border: 1px solid var(--tag-note-border); }
+.tag-urgent    { background-color: var(--tag-urgent-bg);    color: var(--tag-urgent-fg);    border: 1px solid var(--tag-urgent-border); }
+.tag-warning   { background-color: var(--tag-warning-bg);   color: var(--tag-warning-fg);   border: 1px solid var(--tag-warning-border); }
+.tag-nonurgent { background-color: var(--tag-nonurgent-bg); color: var(--tag-nonurgent-fg); border: 1px solid var(--tag-nonurgent-border); }
+.tag-weather   { background-color: var(--tag-weather-bg);   color: var(--tag-weather-fg);   border: 1px solid var(--tag-weather-border); }
+
+/* Solid pill — active/selected button state (base accent + white text) */
+.tag-solid-safety    { background-color: var(--tag-safety);    color: #fff; border: 1px solid var(--tag-safety); }
+.tag-solid-event     { background-color: var(--tag-event);     color: #fff; border: 1px solid var(--tag-event); }
+.tag-solid-note      { background-color: var(--tag-note);      color: #fff; border: 1px solid var(--tag-note); }
+.tag-solid-urgent    { background-color: var(--tag-urgent);    color: #fff; border: 1px solid var(--tag-urgent); }
+.tag-solid-warning   { background-color: var(--tag-warning);   color: #fff; border: 1px solid var(--tag-warning); }
+.tag-solid-nonurgent { background-color: var(--tag-nonurgent); color: #fff; border: 1px solid var(--tag-nonurgent); }
+.tag-solid-weather   { background-color: var(--tag-weather);   color: #fff; border: 1px solid var(--tag-weather); }
+
+/* Outline pill — inactive/unselected button state */
+.tag-outline-safety    { color: var(--tag-safety);    border: 1px solid var(--tag-safety);    background: transparent; }
+.tag-outline-event     { color: var(--tag-event);     border: 1px solid var(--tag-event);     background: transparent; }
+.tag-outline-note      { color: var(--tag-note);      border: 1px solid var(--tag-note);      background: transparent; }
+.tag-outline-urgent    { color: var(--tag-urgent);    border: 1px solid var(--tag-urgent);    background: transparent; }
+.tag-outline-warning   { color: var(--tag-warning);   border: 1px solid var(--tag-warning);   background: transparent; }
+.tag-outline-nonurgent { color: var(--tag-nonurgent); border: 1px solid var(--tag-nonurgent); background: transparent; }
+.tag-outline-weather   { color: var(--tag-weather);   border: 1px solid var(--tag-weather);   background: transparent; }
+
+/* ── Status colors ────────────────────────────────────────────────────────── */
+:root {
+  --status-active:   #16a34a; /* green-600 */
+  --status-inactive: #9ca3af; /* gray-400  */
+}
+.status-active   { color: var(--status-active);   font-weight: 600; }
+.status-inactive { color: var(--status-inactive); font-weight: 600; }
+/* ── End status colors ────────────────────────────────────────────────────── */
+
+/* ── Map pin icon ─────────────────────────────────────────────────────────── */
+.map-pin {
+  width: 40px;
+  height: 40px;
+  border: 3px solid white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  font-size: 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+
+/* ── Pin tooltip card ─────────────────────────────────────────────────────── */
+.tp-card        { font-family: system-ui, -apple-system, sans-serif; width: 260px; }
+.tp-title       { margin: 0 0 7px 0; font-size: 24px; font-weight: 700; color: #111; line-height: 1.3; margin-bottom: 7px; }
+.tp-tags        { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.tp-tag         { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.tp-location    { font-size: 12px; color: #6b7280; margin-bottom: 3px; }
+.tp-meta        { font-size: 12px; margin-bottom: 3px; }
+.tp-verified    { display: flex; align-items: center; gap: 4px; margin-bottom: 3px; font-size: 12px; color: #2563eb; }
+.tp-desc        { margin: 0 0 8px 0; font-size: 12px; color: #444; line-height: 1.45; margin-bottom: 3px;}
+.tp-cta         { text-align: center; background: #3b82f6; color: white; border-radius: 8px; padding: 6px 0; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+.leaflet-tooltip.tp-hidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+.leaflet-tooltip.custom-tooltip,
+.leaflet-tooltip.custom-tooltip * {
+  white-space: normal;
+}
+
 .leaflet-tooltip.custom-tooltip {
   background: white;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 8px 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   font-family: system-ui, -apple-system, sans-serif;
-  max-width: 250px;
+  max-width: 290px;
+  pointer-events: none;
 }
 
 .leaflet-tooltip.custom-tooltip::before {
   border-top-color: white;
 }
+
