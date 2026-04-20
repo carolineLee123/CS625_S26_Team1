@@ -50,12 +50,11 @@ def clear_and_add_boston_reports():
 
         # Amherst, MA (UMass campus) reports — from original fallback data in frontend/app/Page.tsx : (user_id, lat, lng, title, description, category, safety_level, likes, comments, shares, verified_count)
         amherst_reports = [
-            (1, 42.3737, -72.5224, "Winter Weather Alert",                       "Active Winter Weather Warning for winter blizzard storm in the Amherst Area. Expected Temps 20-25 tonight.",                                           "safety", "critical", 10,  0, 4, 14),
-            (1, 42.3740, -72.5250, "Minor Flooding in Men's 2nd Floor Bath",     "On the 2nd floor of the Men's restroom at John W. Lodges Graduate Research Center, there's some water. The people at the desk said they are aware.",   "safety", "medium",   4,  0, 3,  3),
-            (1, 42.3750, -72.5270, "Weekly Student Farmers Market",              "A collaboration between UMass Permaculture and the UMass Student Farmers Market. Fresh seasonal produce available every week at the Student Union.",    "event",  "low",      5,   0, 3,  6),
-            (1, 42.3760, -72.5230, "Campus Maintenance Notice",                  "Scheduled maintenance on building systems across Central Campus. Campus security is monitoring the area.",                                              "note",   "low",      15,   0,  2,  2),
-            (1, 42.3720, -72.5220, "Campus Event Reminder",                      "Community gathering in the central plaza this weekend. Open to all students and staff.",                                                               "event",  "low",      3,   0,  1,  0),
-            (1, 42.3730, -72.5280, "Farmers Market Update",                      "Fresh seasonal produce available this week at Market Square. Support local farming and the community.",                                                "event",  "low",      1,   0,  0,  1),
+            (1, 42.3795, -72.5196, "Winter Weather Alert",                       "Active Winter Weather Warning for winter blizzard storm in the Amherst Area. Expected Temps 20-25 tonight.",                                           "safety", "critical", 10,  0, 4, 14),
+            (1, 42.3938, -72.5277, "Minor Flooding in Men's 2nd Floor Bath",     "On the 2nd floor of the Men's restroom at John W. Lodges Graduate Research Center, there's some water. The people at the desk said they are aware.",   "safety", "medium",   4,  0, 3,  3),
+            (1, 42.3888, -72.5284, "Weekly Student Farmers Market",              "A collaboration between UMass Permaculture and the UMass Student Farmers Market. Fresh seasonal produce available every week at the Student Union.",   "event",  "low",      5,   0, 3,  6),
+            (1, 42.3894, -72.5333, "Hockey Game Tonight",                        "The hockey team will be taking the ice for an upcoming game. Come stop by to catch the action and cheer them on!",                                     "event",   "low",      15,   0,  2,  2),
+            (1, 42.3696, -72.5077, "Baby Duck Sighting!!",                       "The campus cuteness levels just went up because baby ducks have made an appearance :)))",                                                              "note",  "low",      3,   0,  1,  0),
         ]
 
         print("[INFO] Adding Amherst-based reports...")
@@ -81,6 +80,6 @@ def clear_and_add_boston_reports():
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("Adding Boston-based Reports to Database")
+    print("Adding Boston-based & Amherst-based Reports to Database")
     print("=" * 60)
     clear_and_add_boston_reports()
