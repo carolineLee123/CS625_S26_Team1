@@ -4,6 +4,7 @@ import { MapPin as MapPinIcon, Calendar, User, BadgeCheck, Heart, MessageCircle,
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -47,6 +48,9 @@ export function ViewReportModal({ open, onClose, report }: ViewReportModalProps)
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto p-0">
         <DialogHeader className="px-6 pt-6 pb-2">
           <DialogTitle className="text-base font-semibold">Report Details</DialogTitle>
+          <DialogDescription>
+            View the full details of this report.
+          </DialogDescription>
         </DialogHeader>
 
         {/* Report card — mirrors the create-report preview style */}

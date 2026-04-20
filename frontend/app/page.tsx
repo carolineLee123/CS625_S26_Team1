@@ -210,7 +210,7 @@ export default function Page() {
   }, []);
 
   const handleSearchLocation = useCallback(async (query: string) => {
-    if (!mapRef.current || !query.trim()) return;
+    if (!mapRef.current || !query.trim()) return null;
   
     try {
       const response = await fetch(
@@ -225,17 +225,25 @@ export default function Page() {
   
       if (!results.length) {
         console.error("No matching location found.");
-        return;
+        return null;
       }
   
       const lat = parseFloat(results[0].lat);
-      const lon = parseFloat(results[0].lon);
+      const lng = parseFloat(results[0].lon);
+      const label = results[0].display_name || query;
   
-      mapRef.current.flyTo([lat, lon], 15);
+      mapRef.current.flyTo([lat, lng], 15);
+  
+      return { lat, lng, label };
     } catch (error) {
       console.error("Location search failed:", error);
+      return null;
     }
   }, []);
+  
+  const handleSidebarSearch = useCallback(async (query: string) => {
+    await handleSearchLocation(query);
+  }, [handleSearchLocation]);
 
   
   const handleMapClick = useCallback((lat: number, lng: number) => {
@@ -270,7 +278,7 @@ export default function Page() {
         activePost={activePost ? parseInt(activePost) : null}
         onPostClick={handlePostClick}
         posts={posts}
-        onSearch={handleSearchLocation}
+        onSearch={handleSidebarSearch}
       />
 
       {/* Map controls (bottom right) */}
@@ -296,6 +304,7 @@ export default function Page() {
         onReportCreated={loadReports}
         initialLatitude={clickedCoords?.lat}
         initialLongitude={clickedCoords?.lng}
+        onSearchLocation={handleSearchLocation}
       />
 
       {/* User account button (top right) */}

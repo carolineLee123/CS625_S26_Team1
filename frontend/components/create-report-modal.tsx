@@ -5,6 +5,7 @@ import { MapPin, ImagePlus, Navigation, CheckCircle2, Hash, Heart, MessageCircle
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -75,9 +76,10 @@ interface CreateReportModalProps {
   initialLatitude?: number;
   initialLongitude?: number;
   initialLocation?: string;
+  onSearchLocation?: (query: string) => Promise<{ lat: number; lng: number; label: string } | null>;
 }
 
-export function CreateReportModal({ open, onClose, onReportCreated, initialLatitude, initialLongitude, initialLocation }: CreateReportModalProps) {
+export function CreateReportModal({ open, onClose, onReportCreated, initialLatitude, initialLongitude, initialLocation, onSearchLocation }: CreateReportModalProps) {
   const [step, setStep] = useState<Step>('form');
   const [title, setTitle] = useState('');
   const [location, setLocation] = useState('');
@@ -88,6 +90,24 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [clickedLat, setClickedLat] = useState<number | undefined>(initialLatitude);
   const [clickedLng, setClickedLng] = useState<number | undefined>(initialLongitude);
+  const [searchedLocation, setSearchedLocation] = useState<{
+    lat: number;
+    lng: number;
+    label: string;
+  } | null>(null);
+
+  async function handleLocationSearch() {
+    if (!location.trim() || !onSearchLocation) return;
+  
+    const result = await onSearchLocation(location);
+  
+    if (result) {
+      setSearchedLocation(result);
+      setClickedLat(result.lat);
+      setClickedLng(result.lng);
+      setLocation(result.label);
+    }
+  }
 
   function handleClose() {
     onClose();
@@ -179,9 +199,12 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
   if (step === 'form') {
     return (
       <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
-        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto p-0">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0">
           <DialogHeader className="px-6 pt-6 pb-2">
             <DialogTitle className="text-base font-semibold">Create a Report</DialogTitle>
+            <DialogDescription>
+              This is where you can share your observations with the community! Your report will be visible on the map and can help others stay informed and safe.
+            </DialogDescription>
           </DialogHeader>
 
           <div className="px-6 pb-6 flex flex-col gap-4">
@@ -218,9 +241,28 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
                   placeholder="or enter an address"
                   value={location === 'Current Location' ? '' : location}
                   onChange={(e) => setLocation(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleLocationSearch();
+                    }
+                  }}
                   className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                 />
               </div>
+              <button
+                type="button"
+                onClick={handleLocationSearch}
+                disabled={!location.trim() || location === 'Current Location'}
+                className={cn(
+                  "shrink-0 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  location.trim() && location !== 'Current Location'
+                    ? "bg-blue-500 text-white hover:bg-blue-600"
+                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                )}
+              >
+                Search
+              </button>
               {location === 'Current Location' && (
                 <span className="flex items-center gap-1 text-xs text-blue-500 mt-0.5">
                   <MapPin size={11} /> Using your current location
@@ -335,10 +377,13 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
     return (
       <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
         
-        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto p-0">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0">
           <DialogHeader className="px-6 pt-6 pb-2">
             <DialogTitle className="text-base font-semibold">Preview Report</DialogTitle>
           </DialogHeader>
+          <DialogDescription>
+            This is how your report will appear on the public map feed. You can edit before submitting.
+          </DialogDescription>
           {/* Report card */}
           <div className="mx-5 mt-5 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
             <div className="px-5 py-5 flex flex-col gap-3">

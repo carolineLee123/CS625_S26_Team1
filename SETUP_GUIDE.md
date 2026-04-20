@@ -134,6 +134,11 @@ After running the setup script, use these commands:
 ./stop-services.sh
 ```
 
+**Reset all services**
+```bash
+./reset-services.sh
+```
+
 ### Option 2: Manual Start
 
 **Terminal 1 - Start MySQL:**
