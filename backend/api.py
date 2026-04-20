@@ -137,6 +137,92 @@ def create_report():
             'success': False,
             'error': str(e)
         }), 500
+        
+@app.route('/api/reports/<int:report_id>', methods=['PATCH'])
+def update_report(report_id):
+    """Update an existing report"""
+    try:
+        if not db.connection or not db.connection.is_connected():
+            db.connect()
+
+        existing_report = db.get_report_by_id(report_id)
+        if not existing_report:
+            return jsonify({'success': False, 'error': 'Report not found'}), 404
+        
+        current_user_id = 1  # Placeholder for authenticated user ID, since we don't have auth implemented yet
+        if existing_report['user_id'] != current_user_id:
+            return jsonify({'success': False, 'error': 'You can only edit your own reports'}), 403
+
+        data = request.get_json() or {}
+
+        allowed_fields = {
+            'title',
+            'description',
+            'category',
+            'urgency',
+            'status'
+        }
+
+        update_data = {k: v for k, v in data.items() if k in allowed_fields}
+
+        if not update_data:
+            return jsonify({
+                'success': False,
+                'error': 'No valid fields provided for update'
+            }), 400
+
+        category_map = {
+            'Safety': 'safety',
+            'Event': 'event',
+            'Note': 'note'
+        }
+
+        urgency_map = {
+            'Urgent': 'critical',
+            'Warning': 'high',
+            'Non-urgent': 'low'
+        }
+
+        existing_category = existing_report['category']
+        incoming_category = update_data.get('category')
+        final_category = category_map.get(incoming_category, incoming_category) if incoming_category else existing_category
+
+        incoming_urgency = update_data.get('urgency')
+
+        if final_category in ['event', 'note']:
+            final_safety_level = 'low'
+        elif incoming_urgency:
+            final_safety_level = urgency_map.get(incoming_urgency, existing_report['safety_level'])
+        else:
+            final_safety_level = existing_report['safety_level']
+
+        updated_report = db.update_report(
+            report_id=report_id,
+            title=update_data.get('title', existing_report['title']),
+            description=update_data.get('description', existing_report['description']),
+            latitude=update_data.get('latitude', existing_report['latitude']),
+            longitude=update_data.get('longitude', existing_report['longitude']),
+            category=final_category,
+            safety_level=final_safety_level,
+            status=update_data.get('status', existing_report['status'])
+        )
+
+        if updated_report:
+            return jsonify({
+                'success': True,
+                'data': updated_report
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to update report'
+            }), 500
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 if __name__ == '__main__':
     port = int(os.getenv('API_PORT', 5001))

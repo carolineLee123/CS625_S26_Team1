@@ -97,6 +97,8 @@ export default function Page() {
   const [clickedCoords, setClickedCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [viewReportOpen, setViewReportOpen] = useState(false);
   const [selectedPin, setSelectedPin] = useState<MapPin | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [reportToEdit, setReportToEdit] = useState<Report | null>(null);
 
   const posts = useMemo<TrendingPost[]>(
     () => pins.map((pin, index) => convertReportToPost({
@@ -256,6 +258,34 @@ export default function Page() {
     setClickedCoords(null);
   }, []);
 
+  const currentUsername = 'testuser';
+
+  const handleEditReport = useCallback(() => {
+      if (!selectedPin) return;
+    
+      setViewReportOpen(false);
+    
+      setReportToEdit({
+        id: Number(selectedPin.id),
+        title: selectedPin.title,
+        username: selectedPin.username ?? '',
+        description: selectedPin.description ?? '',
+        latitude: selectedPin.lat,
+        longitude: selectedPin.lng,
+        category: (selectedPin.category ?? 'safety') as Report['category'],
+        safety_level: (selectedPin.safetyLevel ?? 'low') as Report['safety_level'],
+        status: (selectedPin.status ?? 'open') as Report['status'],
+        likes: selectedPin.likes ?? 0,
+        comments: selectedPin.comments ?? 0,
+        shares: selectedPin.shares ?? 0,
+        verified_count: selectedPin.verifiedCount ?? 0,
+        created_at: selectedPin.createdAt ?? new Date().toISOString(),
+        updated_at: selectedPin.createdAt ?? new Date().toISOString(),
+      });
+    
+      setEditOpen(true);
+    }, [selectedPin]);
+
   return (
     <main
       className="relative w-screen h-screen overflow-hidden bg-background"
@@ -321,6 +351,24 @@ export default function Page() {
         open={viewReportOpen}
         onClose={() => { setViewReportOpen(false); setActivePost(null); }}
         report={selectedPin}
+        canEdit={selectedPin?.username === currentUsername}
+        onEdit={handleEditReport}
+      />
+
+      <CreateReportModal
+        open={editOpen}
+        onClose={() => {
+          setEditOpen(false);
+          setReportToEdit(null);
+        }}
+        onReportUpdated={async () => {
+          await loadReports();
+          setEditOpen(false);
+          setReportToEdit(null);
+        }}
+        onSearchLocation={handleSearchLocation}
+        mode="edit"
+        reportToEdit={reportToEdit}
       />
     </main>
   );

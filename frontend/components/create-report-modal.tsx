@@ -10,11 +10,19 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { createReport } from '@/lib/api';
+import { createReport, updateReport, type Report } from '@/lib/api';
 
 type Category = 'Safety' | 'Event' | 'Note';
 type Urgency = 'Non-urgent' | 'Warning' | 'Urgent';
 type Step = 'form' | 'preview' | 'confirmed';
+type Status = 'open' | 'in_progress' | 'resolved' | 'closed';
+
+const STATUS_OPTIONS: { label: Status; display: string; color: string; active: string }[] = [
+  { label: 'open', display: 'Active', color: 'border-gray-300 text-gray-600', active: 'bg-gray-100 text-gray-800 border-gray-300' },
+  { label: 'in_progress', display: 'In Progress', color: 'border-blue-300 text-blue-600', active: 'bg-blue-100 text-blue-700 border-blue-300' },
+  { label: 'resolved', display: 'Resolved', color: 'border-green-300 text-green-600', active: 'bg-green-100 text-green-700 border-green-300' },
+  { label: 'closed', display: 'Closed', color: 'border-red-300 text-red-600', active: 'bg-red-100 text-red-700 border-red-300' },
+];
 
 const CATEGORIES: { label: Category; color: string; active: string }[] = [
   { label: 'Safety', color: 'tag-outline-safety',    active: 'tag-solid-safety' },
@@ -69,17 +77,31 @@ function getTagLabel(category: Category | null, urgency: Urgency | null) {
   return category ?? '';
 }
 
+interface EditableReport {
+  id: number;
+  title: string;
+  description: string;
+  category: Report['category'];
+  safety_level: Report['safety_level'];
+  latitude: number;
+  longitude: number;
+  status: Report['status'];
+}
+
 interface CreateReportModalProps {
   open: boolean;
   onClose: () => void;
   onReportCreated?: () => void;
+  onReportUpdated?: () => void;
   initialLatitude?: number;
   initialLongitude?: number;
   initialLocation?: string;
   onSearchLocation?: (query: string) => Promise<{ lat: number; lng: number; label: string } | null>;
+  mode?: 'create' | 'edit';
+  reportToEdit?: EditableReport | null;
 }
 
-export function CreateReportModal({ open, onClose, onReportCreated, initialLatitude, initialLongitude, initialLocation, onSearchLocation }: CreateReportModalProps) {
+export function CreateReportModal({ open, onClose, onReportCreated, onReportUpdated, initialLatitude, initialLongitude, initialLocation, onSearchLocation, mode = 'create', reportToEdit = null, }: CreateReportModalProps) {
   const [step, setStep] = useState<Step>('form');
   const [title, setTitle] = useState('');
   const [location, setLocation] = useState('');
@@ -95,6 +117,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
     lng: number;
     label: string;
   } | null>(null);
+  const [status, setStatus] = useState<Status>('open');
 
   async function handleLocationSearch() {
     if (!location.trim() || !onSearchLocation) return;
@@ -126,6 +149,8 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
     setIsSubmitting(false);
     setClickedLat(undefined);
     setClickedLng(undefined);
+    setSearchedLocation(null);
+    setStatus('open');
   }
 
   useEffect(() => {
@@ -140,16 +165,68 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
     }
   }, [open, initialLatitude, initialLongitude, initialLocation]);
 
+  useEffect(() => {
+    if (open && reportToEdit && mode === 'edit') {
+      setStep('form');
+      setTitle(reportToEdit.title);
+      setDescription(reportToEdit.description);
+      setClickedLat(reportToEdit.latitude);
+      setClickedLng(reportToEdit.longitude);
+      setLocation(`${reportToEdit.latitude.toFixed(4)}, ${reportToEdit.longitude.toFixed(4)}`);
+      setStatus(reportToEdit.status);
+  
+      if (reportToEdit.category === 'safety') {
+        setCategory('Safety');
+  
+        if (reportToEdit.safety_level === 'critical') setUrgency('Urgent');
+        else if (reportToEdit.safety_level === 'high') setUrgency('Warning');
+        else setUrgency('Non-urgent');
+      } else if (reportToEdit.category === 'event') {
+        setCategory('Event');
+        setUrgency(null);
+      } else {
+        setCategory('Note');
+        setUrgency(null);
+      }
+    }
+  }, [open, reportToEdit, mode]);
+
+  useEffect(() => {
+    if (!open) {
+      reset();
+    }
+  }, [open]);
+
   async function handleSubmit() {
     if (!category) return;
-
+  
     setIsSubmitting(true);
-
+  
     try {
-      // Use clicked coordinates if available, otherwise get current location or default
+      if (mode === 'edit' && reportToEdit) {
+        const savedReport = await updateReport(reportToEdit.id, {
+          title,
+          description,
+          category,
+          urgency: category === 'Safety' ? (urgency ?? undefined) : undefined,
+          status,
+        });
+        
+  
+        if (savedReport) {
+          setStep('confirmed');
+          onReportUpdated?.();
+        } else {
+          alert('Failed to save report. Please try again.');
+          setIsSubmitting(false);
+        }
+  
+        return;
+      }
+
       let latitude = clickedLat || 42.3601;
       let longitude = clickedLng || -71.0589;
-
+  
       if (!clickedLat && !clickedLng && location === 'Current Location' && navigator.geolocation) {
         const position = await new Promise<GeolocationPosition>((resolve, reject) => {
           navigator.geolocation.getCurrentPosition(resolve, reject);
@@ -157,7 +234,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
         latitude = position.coords.latitude;
         longitude = position.coords.longitude;
       }
-
+  
       const reportData = {
         title,
         location,
@@ -167,21 +244,19 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
         latitude,
         longitude,
       };
-
-      const newReport = await createReport(reportData);
-
-      if (newReport) {
+  
+      const savedReport = await createReport(reportData);
+  
+      if (savedReport) {
         setStep('confirmed');
-        if (onReportCreated) {
-          onReportCreated();
-        }
+        onReportCreated?.();
       } else {
-        alert('Failed to create report. Please try again.');
+        alert('Failed to save report. Please try again.');
         setIsSubmitting(false);
       }
     } catch (error) {
-      console.error('Error submitting report:', error);
-      alert('Failed to create report. Please try again.');
+      console.error('Error saving report:', error);
+      alert('Failed to save report. Please try again.');
       setIsSubmitting(false);
     }
   }
@@ -201,10 +276,14 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
       <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0">
           <DialogHeader className="px-6 pt-6 pb-2">
-            <DialogTitle className="text-base font-semibold">Create a Report</DialogTitle>
-            <DialogDescription>
-              This is where you can share your observations with the community! Your report will be visible on the map and can help others stay informed and safe.
-            </DialogDescription>
+          <DialogTitle className="text-base font-semibold">
+            {mode === 'edit' ? 'Edit Report' : 'Create a Report'}
+          </DialogTitle>
+          <DialogDescription>
+            {mode === 'edit'
+              ? 'You can update the title, description, category, urgency, and status. Location and photos are locked.'
+              : 'This is where you can share your observations with the community! Your report will be visible on the map and can help others stay informed and safe.'}
+          </DialogDescription>
           </DialogHeader>
 
           <div className="px-6 pb-6 flex flex-col gap-4">
@@ -222,57 +301,26 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
               />
             </div>
 
-            {/* Location */}
-            <div className="flex flex-col gap-1">
+            {/* Status */}
+            <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-gray-700">
-                Location <span className="text-red-500">*</span>
+                Status <span className="text-red-500">*</span>
               </label>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setLocation('Current Location')}
-                  className="flex items-center gap-1.5 shrink-0 rounded-lg border border-blue-300 bg-blue-50 px-3 py-2 text-xs font-medium text-blue-600 hover:bg-blue-100 transition-colors"
-                >
-                  <Navigation size={13} />
-                  Current Location
-                </button>
-                <input
-                  type="text"
-                  placeholder="or enter an address"
-                  value={location === 'Current Location' ? '' : location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleLocationSearch();
-                    }
-                  }}
-                  className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
-                />
+              <div className="flex gap-2 flex-wrap">
+                {STATUS_OPTIONS.map(({ label, display, color, active }) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => setStatus(label)}
+                    className={cn(
+                      'rounded-full border px-4 py-1.5 text-sm font-medium transition-all capitalize',
+                      status === label ? active : cn('bg-white hover:bg-gray-50', color)
+                    )}
+                  >
+                    {display}
+                  </button>
+                ))}
               </div>
-              <button
-                type="button"
-                onClick={handleLocationSearch}
-                disabled={!location.trim() || location === 'Current Location'}
-                className={cn(
-                  "shrink-0 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                  location.trim() && location !== 'Current Location'
-                    ? "bg-blue-500 text-white hover:bg-blue-600"
-                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                )}
-              >
-                Search
-              </button>
-              {location === 'Current Location' && (
-                <span className="flex items-center gap-1 text-xs text-blue-500 mt-0.5">
-                  <MapPin size={11} /> Using your current location
-                </span>
-              )}
-              {clickedLat && clickedLng && location !== 'Current Location' && (
-                <span className="flex items-center gap-1 text-xs text-green-600 mt-0.5">
-                  <MapPin size={11} /> Location from map click: {clickedLat.toFixed(4)}, {clickedLng.toFixed(4)}
-                </span>
-              )}
             </div>
 
             {/* Category */}
@@ -311,6 +359,71 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
               />
             </div>
 
+            {/* Location */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-gray-700">
+                Location <span className="text-red-500">*</span>
+              </label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setLocation('Current Location')}
+                  disabled={mode === 'edit'}
+                  className={cn(
+                    "flex items-center gap-1.5 shrink-0 rounded-lg border px-3 py-2 text-xs font-medium transition-colors",
+                    mode === 'edit'
+                      ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : "border-blue-300 bg-blue-50 text-blue-600 hover:bg-blue-100"
+                  )}
+                >
+                  <Navigation size={13} />
+                  Current Location
+                </button>
+                <input
+                  type="text"
+                  placeholder="or enter an address"
+                  value={location === 'Current Location' ? '' : location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && mode !== 'edit') {
+                      e.preventDefault();
+                      handleLocationSearch();
+                    }
+                  }}
+                  disabled={mode === 'edit'}
+                  className={cn(
+                    "flex-1 rounded-lg border px-3 py-2 text-sm outline-none",
+                    mode === 'edit'
+                      ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : "border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                  )}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleLocationSearch}
+                disabled={mode === 'edit' || !location.trim() || location === 'Current Location'}
+                className={cn(
+                  "shrink-0 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  mode === 'edit' || !location.trim() || location === 'Current Location'
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-blue-500 text-white hover:bg-blue-600"
+                )}
+              >
+                Search
+              </button>
+              {location === 'Current Location' && (
+                <span className="flex items-center gap-1 text-xs text-blue-500 mt-0.5">
+                  <MapPin size={11} /> Using your current location
+                </span>
+              )}
+              {clickedLat && clickedLng && location !== 'Current Location' && (
+                <span className="flex items-center gap-1 text-xs text-green-600 mt-0.5">
+                  <MapPin size={11} /> Location from map click: {clickedLat.toFixed(4)}, {clickedLng.toFixed(4)}
+                </span>
+              )}
+            </div>
+
             {/* Urgency Level — only for Safety */}
             {category === 'Safety' && (
               <div className="flex flex-col gap-1.5">
@@ -336,16 +449,25 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
             )}
 
             {/* Add Photos */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-gray-700">
-                Add Photos <span className="text-xs font-normal text-gray-400">(optional)</span>
-              </label>
-              <label className="flex items-center gap-2 w-fit cursor-pointer rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-colors">
-                <ImagePlus size={16} />
-                {photos.length > 0 ? `${photos.length} photo(s) selected` : 'Upload photos'}
-                <input type="file" accept="image/*" multiple className="hidden" onChange={handlePhotoChange} />
-              </label>
-            </div>
+            <label
+              className={cn(
+                "flex items-center gap-2 w-fit rounded-lg border border-dashed px-4 py-2 text-sm transition-colors",
+                mode === 'edit'
+                  ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "cursor-pointer border-gray-300 text-gray-500 hover:border-blue-400 hover:text-blue-500"
+              )}
+            >
+              <ImagePlus size={16} />
+              {photos.length > 0 ? `${photos.length} photo(s) selected` : 'Upload photos'}
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handlePhotoChange}
+                disabled={mode === 'edit'}
+              />
+            </label>
 
             {/* Footer */}
             <div className="flex justify-end pt-2">
@@ -378,10 +500,10 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
       <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
         
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0">
-          <DialogHeader className="px-6 pt-6 pb-2">
+          <DialogHeader className="px-6 pt-6 pb-0">
             <DialogTitle className="text-base font-semibold">Preview Report</DialogTitle>
           </DialogHeader>
-          <DialogDescription>
+          <DialogDescription className="px-6 pt-0 pb-0 text-sm text-muted-foreground">
             This is how your report will appear on the public map feed. You can edit before submitting.
           </DialogDescription>
           {/* Report card */}
@@ -476,7 +598,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
 
           {/* Info banner */}
           <div className="mx-5 mt-3 rounded-lg bg-blue-50 border border-blue-100 px-4 py-2.5 text-xs text-blue-600">
-            This is how your report will appear on the public map feed. You can edit before submitting.
+            Once you are satisfied with how your report looks, click "Submit Report". You can always make updates to your report later.
           </div>
 
           {/* Footer */}
@@ -499,7 +621,9 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
                   : "bg-blue-500 text-white hover:bg-blue-600 active:scale-95"
               )}
             >
-              {isSubmitting ? 'Submitting...' : 'Submit Report'}
+              {isSubmitting
+              ? (mode === 'edit' ? 'Saving...' : 'Submitting...')
+              : (mode === 'edit' ? 'Save Changes' : 'Submit Report')}
             </button>
           </div>
         </DialogContent>
@@ -511,12 +635,27 @@ export function CreateReportModal({ open, onClose, onReportCreated, initialLatit
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
       <DialogContent className="sm:max-w-sm p-0">
+        <DialogHeader className="sr-only">
+          <DialogTitle>
+            {mode === 'edit' ? 'Report Updated' : 'Report Submitted'}
+          </DialogTitle>
+          <DialogDescription>
+            {mode === 'edit'
+              ? 'Your report changes have been saved successfully.'
+              : 'Your report has been submitted successfully.'}
+          </DialogDescription>
+        </DialogHeader>
+
         <div className="flex flex-col items-center text-center px-8 py-10 gap-4">
           <CheckCircle2 size={48} className="text-green-500" strokeWidth={1.5} />
           <div>
-            <h2 className="text-base font-semibold text-gray-900 mb-1">Report Submitted!</h2>
+            <h2 className="text-base font-semibold text-gray-900 mb-1">
+              {mode === 'edit' ? 'Report Updated!' : 'Report Submitted!'}
+            </h2>
             <p className="text-sm text-gray-500">
-              Your report has been received and is now pinned on the live map for the community to see.
+              {mode === 'edit'
+                ? 'Your changes have been saved and the updated report is now reflected on the map.'
+                : 'Your report has been received and is now pinned on the live map for the community to see.'}
             </p>
           </div>
           <button

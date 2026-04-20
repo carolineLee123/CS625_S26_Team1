@@ -16,6 +16,8 @@ interface ViewReportModalProps {
   open: boolean;
   onClose: () => void;
   report: MapPin | null;
+  canEdit?: boolean;
+  onEdit?: () => void;
 }
 
 function getTimeAgo(dateString?: string): string {
@@ -34,7 +36,7 @@ function getInitials(name?: string): string {
   return name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
 }
 
-export function ViewReportModal({ open, onClose, report }: ViewReportModalProps) {
+export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit }: ViewReportModalProps) {
   if (!report) return null;
 
   const urgencyTag = getUrgencyTag(report.category, report.safetyLevel);
@@ -133,7 +135,16 @@ export function ViewReportModal({ open, onClose, report }: ViewReportModalProps)
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end px-5 py-4">
+        <div className="flex justify-end items-center gap-3 px-5 py-4">
+          {canEdit && (
+            <button
+              type="button"
+              onClick={onEdit}
+              className="rounded-lg px-4 py-2 text-sm font-medium text-blue-600 border border-blue-200 hover:bg-blue-50 transition-all"
+            >
+              Edit Report
+            </button>
+          )}
           <button
             type="button"
             onClick={onClose}
