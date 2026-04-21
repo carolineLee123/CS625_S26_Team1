@@ -43,14 +43,6 @@ const TAG_COLORS = {
   note:      'tag-note',
 };
 
-const AVATAR_COLORS = {
-  urgent:    'tag-urgent',
-  warning:   'tag-warning',
-  nonurgent: 'tag-nonurgent',
-  event:     'tag-event',
-  note:      'tag-note',
-};
-
 function getTagKey(category: Category | null, urgency: Urgency | null) {
   if (category === 'Event') return 'event';
   if (category === 'Note') return 'note';
@@ -599,7 +591,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
                     <User size={12} /> Reported by
                   </span>
                   <span className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <span className={cn('w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0', AVATAR_COLORS[tagKey])}>
+                    <span className={cn('w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0', TAG_COLORS[tagKey])}>
                       Y
                     </span>
                     You

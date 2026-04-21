@@ -19,14 +19,16 @@ import { CreateReportModal } from '@/components/create-report-modal';
 import { ViewReportModal } from '@/components/view-report-modal';
 import { getPrimaryTag } from '@/lib/tags';
 
+
+
 function getSafetyColorFromLevel(category: string, safetyLevel: string): string {
-  if (category === 'event') return '#14b8a6';
-  if (category === 'note')  return '#6b7280';
+  if (category === 'event') return "var(--tag-event)";
+  if (category === 'note')  return "var(--tag-note)";
   switch (safetyLevel) {
-    case 'critical':
-    case 'high':   return '#ef4444';
-    case 'medium': return '#f59e0b';
-    default:       return '#6b7280';
+    case 'critical':  return "var(--tag-urgent)";
+    case 'high':   return "var(--tag-warning)";
+    case 'medium': return "var(--tag-note)";
+    default:       return "var(--tag-note)";
   }
 }
 

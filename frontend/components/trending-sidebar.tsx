@@ -136,16 +136,6 @@ const TAG_COLORS: Record<string, string> = {
   weather:   "tag-weather",
 };
 
-const AVATAR_COLORS: Record<string, string> = {
-  urgent:    "tag-urgent",
-  warning:   "tag-warning",
-  nonurgent: "tag-nonurgent",
-  safety:    "tag-safety",
-  note:      "tag-note",
-  event:     "tag-event",
-  weather:   "tag-weather",
-};
-
 function formatNumber(n: number): string {
   if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "k";
   return String(n);
@@ -394,7 +384,7 @@ function PostCard({
         <div
           className={cn(
             "w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0",
-            AVATAR_COLORS[post.tagColor]
+            TAG_COLORS[post.tagColor]
           )}
         >
           {post.avatar}
@@ -430,7 +420,7 @@ function PostCard({
           <div
             className={cn(
               "w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0",
-              AVATAR_COLORS[post.tagColor]
+              TAG_COLORS[post.tagColor]
             )}
             aria-hidden="true"
           >
