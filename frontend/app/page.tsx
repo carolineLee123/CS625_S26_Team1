@@ -172,6 +172,16 @@ export default function Page() {
     }
   }, [pins]);
 
+  const handleMapClick = useCallback((lat: number, lng: number) => {
+    setClickedCoords({ lat, lng });
+    setCreateOpen(true);
+  }, []);
+
+  const handleCreateClose = useCallback(() => {
+    setCreateOpen(false);
+    setClickedCoords(null);
+  }, []);
+
   const handleMapReady = useCallback((map: L.Map) => {
     mapRef.current = map;
   }, []);
