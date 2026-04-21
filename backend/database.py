@@ -134,7 +134,7 @@ class DatabaseManager:
         try:
             cursor = self.connection.cursor(dictionary=True)
             query = """
-            SELECT r.id, r.title, r.latitude, r.longitude, r.description,
+            SELECT r.id, r.user_id, r.title, r.latitude, r.longitude, r.description,
                    r.category, r.safety_level, r.status, r.created_at,
                    r.updated_at, r.likes, r.comments, r.shares, r.verified_count,
                    u.username
@@ -220,6 +220,52 @@ class DatabaseManager:
             return report
         except Error as e:
             print(f"[ERROR] Error creating report: {e}")
+            return None
+        
+    def update_report(self, report_id, title, description, latitude, longitude, category, safety_level, status):
+        """Update an existing report"""
+        try:
+            if not self.connection or not self.connection.is_connected():
+                self.connect()
+
+            cursor = self.connection.cursor(dictionary=True)
+
+            query = """
+                UPDATE reports
+                SET title = %s,
+                    description = %s,
+                    latitude = %s,
+                    longitude = %s,
+                    category = %s,
+                    safety_level = %s,
+                    status = %s,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = %s
+            """
+
+            values = (
+                title,
+                description,
+                latitude,
+                longitude,
+                category,
+                safety_level,
+                status,
+                report_id
+            )
+
+            cursor.execute(query, values)
+            self.connection.commit()
+
+            if cursor.rowcount == 0:
+                cursor.close()
+                return None
+
+            cursor.close()
+            return self.get_report_by_id(report_id)
+
+        except Error as e:
+            print(f"Error updating report: {e}")
             return None
 
     def close(self):

@@ -9,6 +9,7 @@ set -e  # Exit on any error
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+SOFT_YELLOW='\033[38;5;230m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
@@ -382,11 +383,13 @@ print_info "  - stop-services.sh: Stop all services"
 print_info "  - check-status.sh: Check service status"
 
 # Final Summary
-print_header "Setup Complete!"
+print_header "Setup Complete"
 echo ""
-print_success "All dependencies installed and configured successfully!"
+print_success "All dependencies were installed and configured successfully!"
 echo ""
-echo "Next steps:"
+echo -e "${SOFT_YELLOW}========================================================================================================${NC}"
+echo -e "${SOFT_YELLOW}[IMPORTANT] Services are not running yet. Please follow the next steps to start the application.${NC}"
+echo -e "${SOFT_YELLOW}========================================================================================================${NC}"
 echo ""
 echo "1. Start all services:"
 echo -e "   ${BLUE}./start-services.sh${NC}"
@@ -407,7 +410,7 @@ echo "  - Location: Docker container 'mysql_container'"
 echo "  - Database: testdb"
 echo "  - User: appuser"
 echo "  - Password: secret123"
-echo "  - Reports: 10 Boston-based sample reports"
+echo "  - Reports: 5 Amherst-based & 10 Boston-based sample reports"
 echo ""
-print_success "Setup script completed successfully!"
+print_success "Setup script has completed."
 echo ""

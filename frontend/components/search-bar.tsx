@@ -26,14 +26,6 @@ export function SearchBar({ onMenuClick, sidebarOpen, onSearch }: SearchBarProps
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
 
-  const handleSubmit = async (value: string) => {
-    const trimmed = value.trim();
-    if (!trimmed) return;
-
-    await onSearch(trimmed);
-    setFocused(false);
-  };
-
   const filtered = query
     ? SUGGESTIONS.filter((s) =>
         s.label.toLowerCase().includes(query.toLowerCase())
@@ -86,7 +78,7 @@ export function SearchBar({ onMenuClick, sidebarOpen, onSearch }: SearchBarProps
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setTimeout(() => setFocused(false), 150)}
-          placeholder={placeholder ?? "Search..."}
+          placeholder={"Search..."}
           className="flex-1 bg-transparent text-xs text-foreground placeholder:text-gray-400 outline-none"
           aria-label="Search locations or tags"
           autoComplete="off"
