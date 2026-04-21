@@ -15,13 +15,12 @@ import { createReport, updateReport, type Report } from '@/lib/api';
 type Category = 'Safety' | 'Event' | 'Note';
 type Urgency = 'Non-urgent' | 'Warning' | 'Urgent';
 type Step = 'form' | 'preview' | 'confirmed';
-type Status = 'open' | 'in_progress' | 'resolved' | 'closed';
+type Status = 'open' | 'in_progress' | 'resolved' ;
 
 const STATUS_OPTIONS: { label: Status; display: string; color: string; active: string }[] = [
-  { label: 'open', display: 'Active', color: 'border-gray-300 text-gray-600', active: 'bg-gray-100 text-gray-800 border-gray-300' },
+  { label: 'open', display: 'Active', color: 'border-gray-300 text-gray-600', active: 'bg-gray-200 text-gray-800 border-gray-300' },
   { label: 'in_progress', display: 'In Progress', color: 'border-blue-300 text-blue-600', active: 'bg-blue-100 text-blue-700 border-blue-300' },
   { label: 'resolved', display: 'Resolved', color: 'border-green-300 text-green-600', active: 'bg-green-100 text-green-700 border-green-300' },
-  { label: 'closed', display: 'Closed', color: 'border-red-300 text-red-600', active: 'bg-red-100 text-red-700 border-red-300' },
 ];
 
 const CATEGORIES: { label: Category; color: string; active: string }[] = [
