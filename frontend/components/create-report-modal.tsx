@@ -172,7 +172,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
       setClickedLat(reportToEdit.latitude);
       setClickedLng(reportToEdit.longitude);
       setLocation(`${reportToEdit.latitude.toFixed(4)}, ${reportToEdit.longitude.toFixed(4)}`);
-      setStatus(reportToEdit.status);
+      setStatus(reportToEdit.status === 'closed' ? 'resolved' : reportToEdit.status);
   
       if (reportToEdit.category === 'safety') {
         setCategory('Safety');
@@ -275,7 +275,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
       <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0">
           <DialogHeader className="px-6 pt-6 pb-2">
-          <DialogTitle className="text-lg font-semibold">
+          <DialogTitle className="text-2xl font-semibold">
             {mode === 'edit' ? 'Edit Report' : 'Create a Report'}
           </DialogTitle>
           <DialogDescription>
@@ -500,7 +500,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
         
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0">
           <DialogHeader className="px-6 pt-6 pb-0">
-            <DialogTitle className="text-base font-semibold">Preview Report</DialogTitle>
+            <DialogTitle className="text-2xl font-semibold">Preview Report</DialogTitle>
           </DialogHeader>
           <DialogDescription className="px-6 pt-0 pb-0 text-sm text-muted-foreground">
             This is how your report will appear on the public map feed. You can edit before submitting.

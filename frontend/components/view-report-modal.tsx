@@ -49,7 +49,7 @@ export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto p-0">
         <DialogHeader className="px-6 pt-6 pb-2">
-          <DialogTitle className="text-base font-semibold">Report Details</DialogTitle>
+          <DialogTitle className="text-2xl font-semibold">Report Details</DialogTitle>
           <DialogDescription>
             View the full details of this report.
           </DialogDescription>
