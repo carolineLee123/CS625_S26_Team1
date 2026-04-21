@@ -345,6 +345,30 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
               </div>
             </div>
 
+            {/* Urgency Level — only for Safety */}
+            {category === 'Safety' && (
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-gray-700">
+                  Urgency Level <span className="text-red-500">*</span>
+                </label>
+                <div className="flex gap-2 flex-wrap">
+                  {URGENCY_LEVELS.map(({ label, color, active }) => (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => setUrgency(label)}
+                      className={cn(
+                        'rounded-full border px-4 py-1.5 text-sm font-medium transition-all',
+                        urgency === label ? active : cn('bg-white hover:bg-gray-50', color)
+                      )}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Description */}
             <div className="flex flex-col gap-1">
               <label className="text-sm font-medium text-gray-700">
@@ -423,30 +447,6 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
                 </span>
               )}
             </div>
-
-            {/* Urgency Level — only for Safety */}
-            {category === 'Safety' && (
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-gray-700">
-                  Urgency Level <span className="text-red-500">*</span>
-                </label>
-                <div className="flex gap-2 flex-wrap">
-                  {URGENCY_LEVELS.map(({ label, color, active }) => (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => setUrgency(label)}
-                      className={cn(
-                        'rounded-full border px-4 py-1.5 text-sm font-medium transition-all',
-                        urgency === label ? active : cn('bg-white hover:bg-gray-50', color)
-                      )}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Add Photos */}
             <label
