@@ -67,8 +67,8 @@
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: var(--font-geist), 'Geist Fallback', system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), 'Geist Mono Fallback', monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -185,7 +185,7 @@
   justify-content: center;
   font-weight: bold;
   color: white;
-  font-size: 18px;
+  font-size: var(--text-lg);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   transition: all 0.2s;
@@ -194,15 +194,15 @@
 
 
 /* ── Pin tooltip card ─────────────────────────────────────────────────────── */
-.tp-card        { font-family: system-ui, -apple-system, sans-serif; width: 260px; }
-.tp-title       { margin: 0 0 7px 0; font-size: 24px; font-weight: 700; color: #111; line-height: 1.3; margin-bottom: 7px; }
+.tp-card        { width: 260px; }
+.tp-title       { margin: 0 0 7px 0; font-size: var(--text-lg); font-weight: 700; color: #111; line-height: 1.3; margin-bottom: 7px; }
 .tp-tags        { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
-.tp-tag         { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-.tp-location    { font-size: 12px; color: #6b7280; margin-bottom: 3px; }
-.tp-meta        { font-size: 12px; margin-bottom: 3px; }
-.tp-verified    { display: flex; align-items: center; gap: 4px; margin-bottom: 3px; font-size: 12px; color: #2563eb; }
-.tp-desc        { margin: 0 0 8px 0; font-size: 12px; color: #444; line-height: 1.45; margin-bottom: 3px;}
-.tp-cta         { text-align: center; background: #3b82f6; color: white; border-radius: 8px; padding: 6px 0; font-size: 12px; font-weight: 600; cursor: pointer; }
+.tp-tag         { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: var(--text-sm); font-weight: 600; }
+.tp-location    { font-size: var(--text-sm); color: #6b7280; margin-bottom: 3px; }
+.tp-meta        { font-size: var(--text-sm); margin-bottom: 3px; }
+.tp-verified    { display: flex; align-items: center; gap: 4px; margin-bottom: 3px; font-size: var(--text-sm); color: #2563eb; }
+.tp-desc        { margin: 0 0 8px 0; font-size: var(--text-sm); color: #444; line-height: 1.45; margin-bottom: 3px;}
+.tp-cta         { text-align: center; background: #3b82f6; color: white; border-radius: 8px; padding: 6px 0; font-size: var(--text-sm); font-weight: 600; cursor: pointer; }
 
 .leaflet-tooltip.tp-hidden {
   opacity: 0 !important;
@@ -221,7 +221,6 @@
   border-radius: 12px;
   padding: 14px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-  font-family: system-ui, -apple-system, sans-serif;
   max-width: 290px;
   pointer-events: none;
 }

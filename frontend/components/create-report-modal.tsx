@@ -275,7 +275,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
       <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0">
           <DialogHeader className="px-6 pt-6 pb-2">
-          <DialogTitle className="text-base font-semibold">
+          <DialogTitle className="text-lg font-semibold">
             {mode === 'edit' ? 'Edit Report' : 'Create a Report'}
           </DialogTitle>
           <DialogDescription>

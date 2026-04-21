@@ -79,7 +79,7 @@ export function SearchBar({ onMenuClick, sidebarOpen, onSearch }: SearchBarProps
           onFocus={() => setFocused(true)}
           onBlur={() => setTimeout(() => setFocused(false), 150)}
           placeholder={"Search..."}
-          className="flex-1 bg-transparent text-xs text-foreground placeholder:text-gray-400 outline-none"
+          className="flex-1 bg-transparent text-sm text-foreground placeholder:text-gray-400 outline-none"
           aria-label="Search locations or tags"
           autoComplete="off"
         />
