@@ -141,15 +141,15 @@ export function MapBackground({
 
           const isSafety = pin.category === 'safety' || !pin.category
           const urgencyLabel = !isSafety ? null
-            : (pin.safetyLevel === 'critical' || pin.safetyLevel === 'high') ? 'Urgent'
-            : pin.safetyLevel === 'medium' ? 'Warning'
-            : 'Non-urgent'
+          : pin.safetyLevel === 'critical' ? 'Urgent'
+          : pin.safetyLevel === 'high' ? 'Warning'
+          : 'Non-urgent'
           const urgencyClass = urgencyLabel === 'Urgent' ? 'tag-urgent'
             : urgencyLabel === 'Warning' ? 'tag-warning'
             : 'tag-nonurgent'
 
           const categoryClassMap: Record<string, string> = {
-            safety: 'tag-safety', event: 'tag-event', note: 'tag-note', weather: 'tag-weather',
+            safety: 'tag-safety', event: 'tag-event', note: 'tag-note',
           }
           const catClass = pin.category ? (categoryClassMap[pin.category.toLowerCase()] ?? 'tag-note') : ''
           const categoryLabel = pin.category

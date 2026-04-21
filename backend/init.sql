@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS reports (
     user_id INT NOT NULL,
     latitude DECIMAL(10, 8) NOT NULL,
     longitude DECIMAL(11, 8) NOT NULL,
+    location_text VARCHAR(255),
     title VARCHAR(200) NOT NULL,
     description TEXT NOT NULL,
     category ENUM('safety', 'event','note') NOT NULL,

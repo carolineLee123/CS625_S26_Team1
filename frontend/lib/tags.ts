@@ -18,11 +18,14 @@ export function getCategoryTag(category?: string): TagInfo {
 // Only meaningful for safety reports — returns null for event/note
 export function getUrgencyTag(category?: string, safetyLevel?: string): TagInfo | null {
   if (category?.toLowerCase() !== 'safety') return null;
+
   switch (safetyLevel) {
     case 'critical':
-    case 'high':   return { label: 'Urgent',     cssClass: 'tag-urgent',    color: 'urgent' };
-    case 'medium': return { label: 'Warning',    cssClass: 'tag-warning',   color: 'warning' };
-    default:       return { label: 'Non-urgent', cssClass: 'tag-nonurgent', color: 'nonurgent' };
+      return { label: 'Urgent', cssClass: 'tag-urgent', color: 'urgent' };
+    case 'high':
+      return { label: 'Warning', cssClass: 'tag-warning', color: 'warning' };
+    default:
+      return { label: 'Non-urgent', cssClass: 'tag-nonurgent', color: 'nonurgent' };
   }
 }
 

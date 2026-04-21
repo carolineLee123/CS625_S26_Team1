@@ -84,6 +84,7 @@ interface EditableReport {
   safety_level: Report['safety_level'];
   latitude: number;
   longitude: number;
+  location_text?: string;
   status: Report['status'];
 }
 
@@ -131,6 +132,50 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
     }
   }
 
+  async function handleUseCurrentLocation() {
+    if (!navigator.geolocation) {
+      console.error('Geolocation is not supported by this browser.');
+      return;
+    }
+  
+    try {
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        });
+      });
+  
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+  
+      setClickedLat(lat);
+      setClickedLng(lng);
+      setSearchedLocation(null);
+  
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
+        );
+  
+        if (!response.ok) {
+          throw new Error('Reverse geocoding failed');
+        }
+  
+        const result = await response.json();
+        const label = result.display_name || 'Current Location';
+  
+        setLocation(label);
+      } catch (error) {
+        console.error('Reverse geocoding failed:', error);
+        setLocation('Current Location');
+      }
+    } catch (error) {
+      console.error('Unable to get current location:', error);
+    }
+  }
+
   function handleClose() {
     onClose();
     // reset after animation settles
@@ -171,7 +216,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
       setDescription(reportToEdit.description);
       setClickedLat(reportToEdit.latitude);
       setClickedLng(reportToEdit.longitude);
-      setLocation(`${reportToEdit.latitude.toFixed(4)}, ${reportToEdit.longitude.toFixed(4)}`);
+      setLocation(reportToEdit.location_text || `${reportToEdit.latitude.toFixed(4)}, ${reportToEdit.longitude.toFixed(4)}`);
       setStatus(reportToEdit.status === 'closed' ? 'resolved' : reportToEdit.status);
   
       if (reportToEdit.category === 'safety') {
@@ -390,7 +435,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setLocation('Current Location')}
+                  onClick={handleUseCurrentLocation}
                   disabled={mode === 'edit'}
                   className={cn(
                     "flex items-center gap-1.5 shrink-0 rounded-lg border px-3 py-2 text-xs font-medium transition-colors",
@@ -437,12 +482,12 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
               </button>
               {location === 'Current Location' && (
                 <span className="flex items-center gap-1 text-xs text-blue-500 mt-0.5">
-                  <MapPin size={11} /> Using your current location
+                  <MapPin size={11} /> Current location:
                 </span>
               )}
               {clickedLat && clickedLng && location !== 'Current Location' && (
                 <span className="flex items-center gap-1 text-xs text-green-600 mt-0.5">
-                  <MapPin size={11} /> Location from map click: {clickedLat.toFixed(4)}, {clickedLng.toFixed(4)}
+                  <MapPin size={11} /> Location: {location}
                 </span>
               )}
             </div>

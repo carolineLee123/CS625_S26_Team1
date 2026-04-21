@@ -16,6 +16,7 @@ export interface Report {
   created_at: string;
   updated_at: string;
   username: string;
+  location_text?: string;
 }
 
 export interface ApiResponse<T> {
