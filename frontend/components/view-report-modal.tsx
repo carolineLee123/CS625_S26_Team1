@@ -65,7 +65,7 @@ export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit
             <div className="flex flex-wrap gap-1.5">
               {report.status && (
                 <span className={cn(
-                  'rounded-full px-3 py-0.5 text-xs font-semibold',
+                  'rounded-full px-3 py-0.5 text-sm font-semibold',
                   report.status === 'open' ? 'bg-green-100 text-green-700 border border-green-200'
                   : report.status === 'in_progress' ? 'bg-blue-100 text-blue-700 border border-blue-200'
                   : 'bg-gray-100 text-gray-500 border border-gray-200'
@@ -77,11 +77,11 @@ export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit
                 </span>
               )}
               {urgencyTag && (
-                <span className={cn('rounded-full px-3 py-0.5 text-xs font-semibold', urgencyTag.cssClass)}>
+                <span className={cn('rounded-full px-3 py-0.5 text-sm font-semibold', urgencyTag.cssClass)}>
                   {urgencyTag.label}
                 </span>
               )}
-              <span className={cn('rounded-full px-3 py-0.5 text-xs font-semibold', categoryTag.cssClass)}>
+              <span className={cn('rounded-full px-3 py-0.5 text-sm font-semibold', categoryTag.cssClass)}>
                 {categoryTag.label}
               </span>
             </div>
@@ -89,22 +89,22 @@ export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit
             {/* Metadata grid */}
             <div className="grid grid-cols-2 gap-y-3 gap-x-4">
               <div className="flex flex-col gap-0.5">
-                <span className="flex items-center gap-1 font-semibold text-gray-700 text-xs">
+                <span className="flex items-center gap-1 font-semibold text-gray-700 text-sm">
                   <MapPinIcon size={12} /> Location
                 </span>
-                <span className="text-xs text-gray-500 leading-snug">{report.location}</span>
+                <span className="text-sm text-gray-500 leading-snug">{report.location}</span>
               </div>
               <div className="flex flex-col gap-0.5">
-                <span className="flex items-center gap-1 font-semibold text-gray-700 text-xs">
+                <span className="flex items-center gap-1 font-semibold text-gray-700 text-sm">
                   <Calendar size={12} /> Date &amp; Time
                 </span>
-                <span className="text-xs text-gray-500">{postedLabel}</span>
+                <span className="text-sm text-gray-500">{postedLabel}</span>
               </div>
               <div className="flex flex-col gap-0.5">
-                <span className="flex items-center gap-1 font-semibold text-gray-700 text-xs">
+                <span className="flex items-center gap-1 font-semibold text-gray-700 text-sm">
                   <User size={12} /> Reported by
                 </span>
-                <span className="flex items-center gap-1.5 text-xs text-gray-500">
+                <span className="flex items-center gap-1.5 text-sm text-gray-500">
                   <span className={cn('w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0', categoryTag.cssClass)}>
                     {getInitials(report.username)}
                   </span>
@@ -112,10 +112,10 @@ export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit
                 </span>
               </div>
               <div className="flex flex-col gap-0.5">
-                <span className="flex items-center gap-1 font-semibold text-gray-700 text-xs">
+                <span className="flex items-center gap-1 font-semibold text-gray-700 text-sm">
                   <BadgeCheck size={12} /> Verified by
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-sm text-gray-500">
                   {report.verifiedCount ?? 0} member{report.verifiedCount === 1 ? '' : 's'}
                 </span>
               </div>
@@ -125,7 +125,7 @@ export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit
             <p className="text-sm text-gray-700 leading-relaxed">{report.description}</p>
 
             {/* Stats */}
-            <div className="flex items-center gap-5 pt-1 border-t border-gray-100 text-xs text-gray-400">
+            <div className="flex items-center gap-5 pt-1 border-t border-gray-100 text-sm text-gray-400">
               <span className="flex items-center gap-1"><Heart size={12} /> {report.likes ?? 0}</span>
               <span className="flex items-center gap-1"><MessageCircle size={12} /> {report.comments ?? 0}</span>
               <span className="flex items-center gap-1"><Hash size={12} />✓ {report.verifiedCount ?? 0}</span>
