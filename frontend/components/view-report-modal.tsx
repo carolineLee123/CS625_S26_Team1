@@ -1,13 +1,18 @@
 'use client';
 
-import { MapPin as MapPinIcon, Calendar, User, BadgeCheck, Heart, MessageCircle, Hash, Share2 } from 'lucide-react';
+import { MapPin as MapPinIcon, Calendar, User, BadgeCheck, Heart, MessageCircle, Hash, Share2, MoreHorizontal, Pencil } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { type MapPin } from '@/components/map-background';
 import { getCategoryTag, getUrgencyTag } from '@/lib/tags';
@@ -48,11 +53,31 @@ export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto p-0 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+        {/* Edit button */}
+        {canEdit && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="absolute top-6 right-12 rounded-xs opacity-70 hover:opacity-100 transition-opacity focus:outline-none"
+                aria-label="More options"
+              >
+                <MoreHorizontal className="size-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={onEdit} className="focus:bg-gray-200">
+                <Pencil className="size-4 mr-2" /> Edit Report
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
         <DialogHeader className="px-6 pt-6 pb-2">
           {/* Title */}
-          <DialogTitle className="text-2xl font-semibold">{report.title}</DialogTitle>
+          <DialogTitle className="text-2xl font-semibold w-90 ">{report.title}</DialogTitle>
           {/* Report card — mirrors the create-report preview style */}
-            <div className=" py-2 flex flex-col gap-3">
+            <div className="pt-3 pb-2 flex flex-col gap-3">
             {/* Tag pills */}
             <div className="flex flex-wrap gap-1.5">
               {report.status && (
@@ -127,27 +152,6 @@ export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit
           
         </DialogHeader>
 
-        
-
-        {/* Footer */}
-        <div className="flex justify-end items-center gap-3 px-5 py-4">
-          {canEdit && (
-            <button
-              type="button"
-              onClick={onEdit}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-blue-600 border border-blue-200 hover:bg-blue-50 transition-all"
-            >
-              Edit Report
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg px-5 py-2 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 active:scale-95 transition-all"
-          >
-            Close
-          </button>
-        </div>
       </DialogContent>
     </Dialog>
   );

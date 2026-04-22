@@ -185,6 +185,7 @@ export function MapBackground({
             ? pin.description.substring(0, 70) + (pin.description.length > 70 ? '…' : '')
             : ''
 
+          /* Card contents */
           tooltipContent = `
             <div class="tp-card">
               <h3 class="tp-title">${pin.title}</h3>

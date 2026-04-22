@@ -634,7 +634,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
           </div>
 
           {/* Info banner */}
-          <div className="mx-5 mt-3 rounded-lg bg-blue-50 border border-blue-200 px-4 py-2.5 text-xs text-blue-600">
+          <div className="mx-5 mt-3 rounded-lg bg-blue-50 border border-blue-200 px-4 py-2.5 text-sm text-blue-600">
             Once you are satisfied with how your report looks, click "Submit Report". You can always make updates to your report later.
           </div>
 
