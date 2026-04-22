@@ -119,7 +119,10 @@ export function MapBackground({
 
       userLocationMarkerRef.current = L.marker([lat, lng], { icon, zIndexOffset: 2000 })
         .addTo(map.current)
-        .bindTooltip("You are here", { direction: "top", offset: [0, -12] })
+        ///.bindTooltip("You are here", { direction: "top", offset: [0, -12] })
+
+      const userEl = userLocationMarkerRef.current.getElement()
+      if (userEl) userEl.style.pointerEvents = 'none'
     })
   }, [mapReady])
 
