@@ -47,20 +47,12 @@ export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto p-0">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto p-0 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
         <DialogHeader className="px-6 pt-6 pb-2">
-          <DialogTitle className="text-2xl font-semibold">Report Details</DialogTitle>
-          <DialogDescription>
-            View the full details of this report.
-          </DialogDescription>
-        </DialogHeader>
-
-        {/* Report card — mirrors the create-report preview style */}
-        <div className="mx-5 mt-3 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
-          <div className="px-5 py-5 flex flex-col gap-3">
-            {/* Title */}
-            <h2 className="text-lg font-bold text-gray-900 leading-snug">{report.title}</h2>
-
+          {/* Title */}
+          <DialogTitle className="text-2xl font-semibold">{report.title}</DialogTitle>
+          {/* Report card — mirrors the create-report preview style */}
+            <div className=" py-2 flex flex-col gap-3">
             {/* Tag pills */}
             <div className="flex flex-wrap gap-1.5">
               {report.status && (
@@ -132,7 +124,10 @@ export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit
               <span className="flex items-center gap-1 ml-auto"><Share2 size={12} /> {report.shares ?? 0}</span>
             </div>
           </div>
-        </div>
+          
+        </DialogHeader>
+
+        
 
         {/* Footer */}
         <div className="flex justify-end items-center gap-3 px-5 py-4">

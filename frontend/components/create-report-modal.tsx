@@ -333,7 +333,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
                 placeholder="e.g. Minor flooding in Men's 2nd floor bath"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
               />
             </div>
 
@@ -415,7 +415,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none"
               />
             </div>
 
@@ -432,7 +432,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
                   className={cn(
                     "flex items-center gap-1.5 shrink-0 rounded-lg border px-3 py-2 text-xs font-medium transition-colors",
                     mode === 'edit'
-                      ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
+                      ? "border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed"
                       : "border-blue-300 bg-blue-50 text-blue-600 hover:bg-blue-100"
                   )}
                 >
@@ -455,7 +455,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
                     "flex-1 rounded-lg border px-3 py-2 text-sm outline-none",
                     mode === 'edit'
                       ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
-                      : "border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                      : "border-gray-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                   )}
                 />
               </div>
@@ -489,7 +489,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
               className={cn(
                 "flex items-center gap-2 w-fit rounded-lg border border-dashed px-4 py-2 text-sm transition-colors",
                 mode === 'edit'
-                  ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
+                  ? "border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed"
                   : "cursor-pointer border-gray-300 text-gray-500 hover:border-blue-400 hover:text-blue-500"
               )}
             >
@@ -543,7 +543,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
             This is how your report will appear on the public map feed. You can edit before submitting.
           </DialogDescription>
           {/* Report card */}
-          <div className="mx-5 mt-5 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+          <div className="mx-5 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
             <div className="px-5 py-5 flex flex-col gap-3">
               {/* Title */}
               <h2 className="text-lg font-bold text-gray-900 leading-snug">{title}</h2>
@@ -553,6 +553,7 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
                 <span className="rounded-full px-3 py-0.5 text-xs font-semibold bg-green-100 text-green-700 border border-green-200">
                   Active
                 </span>
+
                 {urgency && urgency !== 'Non-urgent' && (
                   <span className={cn(
                     'rounded-full px-3 py-0.5 text-xs font-semibold',
@@ -633,19 +634,20 @@ export function CreateReportModal({ open, onClose, onReportCreated, onReportUpda
           </div>
 
           {/* Info banner */}
-          <div className="mx-5 mt-3 rounded-lg bg-blue-50 border border-blue-100 px-4 py-2.5 text-xs text-blue-600">
+          <div className="mx-5 mt-3 rounded-lg bg-blue-50 border border-blue-200 px-4 py-2.5 text-xs text-blue-600">
             Once you are satisfied with how your report looks, click "Submit Report". You can always make updates to your report later.
           </div>
 
           {/* Footer */}
-          <div className="flex justify-between items-center px-5 py-4">
+          <div className="flex justify-end-safe gap-3 px-5 py-4">
             <button
               type="button"
               onClick={() => setStep('form')}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 active:scale-95 transition-all"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 border border-gray-400 hover:bg-gray-200 active:scale-95 transition-all"
             >
               Keep Editing
             </button>
+
             <button
               type="button"
               onClick={handleSubmit}
