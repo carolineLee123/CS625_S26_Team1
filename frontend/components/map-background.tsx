@@ -44,6 +44,7 @@ export function MapBackground({
   const map = useRef<any>(null)
   const markersRef = useRef<{ [key: string]: any }>({})
   const bridgesRef = useRef<{ [key: string]: HTMLDivElement }>({})
+  const userLocationMarkerRef = useRef<any>(null)
   const [mapReady, setMapReady] = useState(false)
   const selectedPinIdRef = useRef<string | null>(null)
   const onReadMoreRef = useRef(onReadMore)
@@ -99,6 +100,28 @@ export function MapBackground({
       }
     }
   }, [onMapReady, onMapClick])
+
+  // show user's current coords on map to see distance from report cases
+  useEffect(() => {
+    if (!mapReady || !map.current || !navigator.geolocation) return
+
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const L = (await import("leaflet")).default
+      if (!map.current) return
+
+      const { latitude: lat, longitude: lng } = pos.coords
+      const icon = L.divIcon({
+        html: `<div style="width:18px;height:18px;border-radius:50%;background: #3b82f6 ;border:3px solid #fff;box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.5);"></div>`,
+        className: "",
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
+      })
+
+      userLocationMarkerRef.current = L.marker([lat, lng], { icon, zIndexOffset: 2000 })
+        .addTo(map.current)
+        .bindTooltip("You are here", { direction: "top", offset: [0, -12] })
+    })
+  }, [mapReady])
 
   useEffect(() => {
     const updatePins = async () => {
