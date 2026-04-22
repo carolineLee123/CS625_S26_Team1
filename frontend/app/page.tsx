@@ -111,6 +111,7 @@ export default function Page() {
       description: pin.description ?? '',
       latitude: pin.lat,
       longitude: pin.lng,
+      location_text: pin.location ?? '',
       category: (pin.category ?? 'safety') as Report['category'],
       safety_level: (pin.safetyLevel ?? 'low') as Report['safety_level'],
       status: (pin.status ?? 'open') as Report['status'],
