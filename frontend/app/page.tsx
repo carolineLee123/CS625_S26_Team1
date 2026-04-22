@@ -13,20 +13,23 @@ import { Plus, User } from 'lucide-react';
 import { type MapPin } from '@/components/map-background';
 import { TrendingSidebar, type TrendingPost } from '@/components/trending-sidebar';
 import { MapControls } from '@/components/map-controls';
+import { MapLegend } from '@/components/map-legend';
 import { fetchReports, type Report } from '@/lib/api';
 import { CreateReportModal } from '@/components/create-report-modal';
 // import { SearchBar } from "@/components/search-bar"; -- needs to be repurposed, updates underway
 import { ViewReportModal } from '@/components/view-report-modal';
 import { getPrimaryTag } from '@/lib/tags';
 
+
+
 function getSafetyColorFromLevel(category: string, safetyLevel: string): string {
-  if (category === 'event') return '#14b8a6';
-  if (category === 'note')  return '#6b7280';
+  if (category === 'event') return "var(--tag-event)";
+  if (category === 'note')  return "var(--tag-note)";
   switch (safetyLevel) {
-    case 'critical':
-    case 'high':   return '#ef4444';
-    case 'medium': return '#f59e0b';
-    default:       return '#6b7280';
+    case 'critical':  return "var(--tag-urgent)";
+    case 'high':   return "var(--tag-warning)";
+    case 'medium': return "var(--tag-note)";
+    default:       return "var(--tag-note)";
   }
 }
 
@@ -54,7 +57,7 @@ function convertReportToPost(report: Report, rank: number): TrendingPost {
     handle: report.username,
     avatar: initials,
     content: report.description,
-    location: `${report.latitude.toFixed(4)}, ${report.longitude.toFixed(4)}`,
+    location: report.location_text || `${report.latitude.toFixed(4)}, ${report.longitude.toFixed(4)}`,
     likes: report.likes,
     comments: report.comments,
     shares: report.shares,
@@ -75,7 +78,7 @@ function convertReportToPin(report: Report): MapPin {
     description: report.description,
     category: report.category,
     safetyLevel: report.safety_level,
-    location: `${report.latitude.toFixed(4)}, ${report.longitude.toFixed(4)}`,
+    location: report.location_text || `${report.latitude.toFixed(4)}, ${report.longitude.toFixed(4)}`,
     status: report.status,
     createdAt: report.created_at,
     verifiedCount: report.verified_count,
@@ -97,6 +100,8 @@ export default function Page() {
   const [clickedCoords, setClickedCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [viewReportOpen, setViewReportOpen] = useState(false);
   const [selectedPin, setSelectedPin] = useState<MapPin | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [reportToEdit, setReportToEdit] = useState<Report | null>(null);
 
   const posts = useMemo<TrendingPost[]>(
     () => pins.map((pin, index) => convertReportToPost({
@@ -122,6 +127,7 @@ export default function Page() {
   const loadReports = useCallback(async () => {
     setLoading(true);
     const reports = await fetchReports();
+    console.log(reports);
 
     const convertedPins = reports.map(report => convertReportToPin(report));
     setPins(convertedPins);
@@ -209,7 +215,7 @@ export default function Page() {
   }, []);
 
   const handleSearchLocation = useCallback(async (query: string) => {
-    if (!mapRef.current || !query.trim()) return;
+    if (!mapRef.current || !query.trim()) return null;
   
     try {
       const response = await fetch(
@@ -224,17 +230,65 @@ export default function Page() {
   
       if (!results.length) {
         console.error("No matching location found.");
-        return;
+        return null;
       }
   
       const lat = parseFloat(results[0].lat);
-      const lon = parseFloat(results[0].lon);
+      const lng = parseFloat(results[0].lon);
+      const label = results[0].display_name || query;
   
-      mapRef.current.flyTo([lat, lon], 15);
+      mapRef.current.flyTo([lat, lng], 15);
+  
+      return { lat, lng, label };
     } catch (error) {
       console.error("Location search failed:", error);
+      return null;
     }
   }, []);
+  
+  const handleSidebarSearch = useCallback(async (query: string) => {
+    await handleSearchLocation(query);
+  }, [handleSearchLocation]);
+
+  
+  const handleMapClick = useCallback((lat: number, lng: number) => {
+    setClickedCoords({ lat, lng });
+    setCreateOpen(true);
+  }, []);
+
+  const handleCreateClose = useCallback(() => {
+    setCreateOpen(false);
+    setClickedCoords(null);
+  }, []);
+
+  const currentUsername = 'testuser';
+
+  const handleEditReport = useCallback(() => {
+      if (!selectedPin) return;
+    
+      setViewReportOpen(false);
+    
+      setReportToEdit({
+        id: Number(selectedPin.id),
+        title: selectedPin.title,
+        username: selectedPin.username ?? '',
+        description: selectedPin.description ?? '',
+        latitude: selectedPin.lat,
+        longitude: selectedPin.lng,
+        location_text: selectedPin.location ?? '',
+        category: (selectedPin.category ?? 'safety') as Report['category'],
+        safety_level: (selectedPin.safetyLevel ?? 'low') as Report['safety_level'],
+        status: (selectedPin.status ?? 'open') as Report['status'],
+        likes: selectedPin.likes ?? 0,
+        comments: selectedPin.comments ?? 0,
+        shares: selectedPin.shares ?? 0,
+        verified_count: selectedPin.verifiedCount ?? 0,
+        created_at: selectedPin.createdAt ?? new Date().toISOString(),
+        updated_at: selectedPin.createdAt ?? new Date().toISOString(),
+      });
+    
+      setEditOpen(true);
+    }, [selectedPin]);
 
   return (
     <main
@@ -258,7 +312,7 @@ export default function Page() {
         activePost={activePost ? parseInt(activePost) : null}
         onPostClick={handlePostClick}
         posts={posts}
-        onSearch={handleSearchLocation}
+        onSearch={handleSidebarSearch}
       />
 
       {/* Map controls (bottom right) */}
@@ -267,6 +321,9 @@ export default function Page() {
         onZoomOut={handleZoomOut}
         onCenter={handleCenter}
       />
+
+      {/* Map legend (bottom left) */}
+      <MapLegend />
 
       {/* Floating (+) create report button */}
       <button
@@ -284,6 +341,7 @@ export default function Page() {
         onReportCreated={loadReports}
         initialLatitude={clickedCoords?.lat}
         initialLongitude={clickedCoords?.lng}
+        onSearchLocation={handleSearchLocation}
       />
 
       {/* User account button (top right) */}
@@ -300,6 +358,24 @@ export default function Page() {
         open={viewReportOpen}
         onClose={() => { setViewReportOpen(false); setActivePost(null); }}
         report={selectedPin}
+        canEdit={selectedPin?.username === currentUsername}
+        onEdit={handleEditReport}
+      />
+
+      <CreateReportModal
+        open={editOpen}
+        onClose={() => {
+          setEditOpen(false);
+          setReportToEdit(null);
+        }}
+        onReportUpdated={async () => {
+          await loadReports();
+          setEditOpen(false);
+          setReportToEdit(null);
+        }}
+        onSearchLocation={handleSearchLocation}
+        mode="edit"
+        reportToEdit={reportToEdit}
       />
     </main>
   );

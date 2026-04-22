@@ -136,16 +136,6 @@ const TAG_COLORS: Record<string, string> = {
   weather:   "tag-weather",
 };
 
-const AVATAR_COLORS: Record<string, string> = {
-  urgent:    "tag-urgent",
-  warning:   "tag-warning",
-  nonurgent: "tag-nonurgent",
-  safety:    "tag-safety",
-  note:      "tag-note",
-  event:     "tag-event",
-  weather:   "tag-weather",
-};
-
 function formatNumber(n: number): string {
   if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "k";
   return String(n);
@@ -250,7 +240,7 @@ export function TrendingSidebar({ open, onClose, activePost, onPostClick, posts 
                   onFocus={() => setFocused(true)}
                   onBlur={() => setTimeout(() => setFocused(false), 150)}
                   placeholder="Search..."
-                  className="flex-1 bg-transparent text-xs text-foreground placeholder:text-gray-400 outline-none"
+                  className="flex-1 bg-transparent text-sm text-foreground placeholder:text-gray-400 outline-none"
                   aria-label="Search locations or tags"
                   autoComplete="off"
                 />
@@ -277,7 +267,7 @@ export function TrendingSidebar({ open, onClose, activePost, onPostClick, posts 
                   <button
                     key={i}
                     type="button"
-                    className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 transition-colors text-left text-xs"
+                    className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 transition-colors text-left text-sm"
                     onMouseDown={() => {
                       setQuery(s.label);
                       handleSubmit(s.label);
@@ -286,7 +276,7 @@ export function TrendingSidebar({ open, onClose, activePost, onPostClick, posts 
                   >
                     {iconFor(s.type)}
                     <div>
-                      <p className="text-xs text-foreground">{s.label}</p>
+                      <p className="text-sm text-foreground">{s.label}</p>
                       <p className="text-[11px] text-gray-500">{s.sublabel}</p>
                     </div>
                   </button>
@@ -311,7 +301,7 @@ export function TrendingSidebar({ open, onClose, activePost, onPostClick, posts 
             <h2 className="font-semibold text-foreground text-sm">
               Trending
             </h2>
-            <span className="text-xs bg-blue-100 text-blue-700 border border-blue-300 rounded-full px-2 py-0.5 font-mono">
+            <span className="text-sm bg-blue-100 text-blue-700 border border-blue-300 rounded-full px-2 py-0.5 font-mono">
               {filtered.length}
             </span>
           </div>
@@ -319,7 +309,7 @@ export function TrendingSidebar({ open, onClose, activePost, onPostClick, posts 
             <button
               onClick={() => setView("list")}
               className={cn(
-                "p-1.5 rounded-md transition-colors text-xs",
+                "p-1.5 rounded-md transition-colors text-sm",
                 view === "list"
                   ? "bg-gray-200 text-foreground"
                   : "text-gray-400 hover:text-foreground"
@@ -331,7 +321,7 @@ export function TrendingSidebar({ open, onClose, activePost, onPostClick, posts 
             <button
               onClick={() => setView("compact")}
               className={cn(
-                "p-1.5 rounded-md transition-colors text-xs",
+                "p-1.5 rounded-md transition-colors text-sm",
                 view === "compact"
                   ? "bg-gray-200 text-foreground"
                   : "text-gray-400 hover:text-foreground"
@@ -359,7 +349,7 @@ export function TrendingSidebar({ open, onClose, activePost, onPostClick, posts 
 
         {/* Footer */}
         <div className="px-4 py-3 border-t border-border/40">
-          <p className="text-xs text-muted-foreground text-center">
+          <p className="text-sm text-muted-foreground text-center">
             Updated live &bull; Powered by GeoFeed
           </p>
         </div>
@@ -390,17 +380,17 @@ function PostCard({
           active ? "bg-primary/10 border-l-2 border-primary" : "hover:bg-secondary/30 border-l-2 border-transparent"
         )}
       >
-        <span className="text-xs font-mono text-muted-foreground w-5">#{post.rank}</span>
+        <span className="text-sm font-mono text-muted-foreground w-5">#{post.rank}</span>
         <div
           className={cn(
             "w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0",
-            AVATAR_COLORS[post.tagColor]
+            TAG_COLORS[post.tagColor]
           )}
         >
           {post.avatar}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-medium text-foreground truncate">{post.username}</p>
+          <p className="text-sm font-medium text-foreground truncate">{post.username}</p>
           <p className="text-[11px] text-muted-foreground truncate">{post.location}</p>
         </div>
         <span className={cn("text-[10px] px-1.5 py-0.5 rounded border font-medium", TAG_COLORS[post.tagColor])}>
@@ -424,13 +414,13 @@ function PostCard({
       >
         {/* Top row */}
         <div className="flex items-start gap-3 mb-2">
-          <span className="text-xs font-mono text-muted-foreground mt-1 w-4 shrink-0">
+          <span className="text-sm font-mono text-muted-foreground mt-1 w-4 shrink-0">
             {post.rank}
           </span>
           <div
             className={cn(
-              "w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0",
-              AVATAR_COLORS[post.tagColor]
+              "w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0",
+              TAG_COLORS[post.tagColor]
             )}
             aria-hidden="true"
           >
@@ -443,12 +433,12 @@ function PostCard({
               </span>
               <span className="text-[11px] text-muted-foreground shrink-0">{post.timeAgo}</span>
             </div>
-            <span className="text-xs text-muted-foreground">{post.handle}</span>
+            <span className="text-sm text-muted-foreground">{post.handle}</span>
           </div>
         </div>
 
         {/* Content */}
-        <p className="text-xs text-foreground/80 leading-relaxed mb-2.5 ml-7 line-clamp-2">
+        <p className="text-sm text-foreground/80 leading-relaxed mb-2.5 ml-7 line-clamp-2">
           {post.content}
         </p>
 

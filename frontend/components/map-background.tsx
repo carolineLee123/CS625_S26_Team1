@@ -141,15 +141,15 @@ export function MapBackground({
 
           const isSafety = pin.category === 'safety' || !pin.category
           const urgencyLabel = !isSafety ? null
-            : (pin.safetyLevel === 'critical' || pin.safetyLevel === 'high') ? 'Urgent'
-            : pin.safetyLevel === 'medium' ? 'Warning'
-            : 'Non-urgent'
+          : pin.safetyLevel === 'critical' ? 'Urgent'
+          : pin.safetyLevel === 'high' ? 'Warning'
+          : 'Non-urgent'
           const urgencyClass = urgencyLabel === 'Urgent' ? 'tag-urgent'
             : urgencyLabel === 'Warning' ? 'tag-warning'
             : 'tag-nonurgent'
 
           const categoryClassMap: Record<string, string> = {
-            safety: 'tag-safety', event: 'tag-event', note: 'tag-note', weather: 'tag-weather',
+            safety: 'tag-safety', event: 'tag-event', note: 'tag-note',
           }
           const catClass = pin.category ? (categoryClassMap[pin.category.toLowerCase()] ?? 'tag-note') : ''
           const categoryLabel = pin.category
@@ -158,8 +158,7 @@ export function MapBackground({
 
           const statusLabel = pin.status === 'open' ? 'Active'
             : pin.status === 'in_progress' ? 'In Progress'
-            : pin.status === 'resolved' ? 'Resolved'
-            : pin.status === 'closed' ? 'Inactive'
+            : pin.status === 'closed' ? 'Closed'
             : pin.status ?? ''
 
           let dateLabel = ''
@@ -185,6 +184,7 @@ export function MapBackground({
             ? pin.description.substring(0, 70) + (pin.description.length > 70 ? '…' : '')
             : ''
 
+          /* Card contents */
           tooltipContent = `
             <div class="tp-card">
               <h3 class="tp-title">${pin.title}</h3>

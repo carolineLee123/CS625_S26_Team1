@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
 
 export interface Report {
   id: number;
@@ -8,7 +8,7 @@ export interface Report {
   description: string;
   category: 'safety' | 'event' | 'note' | 'weather' | 'infrastructure' | 'other';
   safety_level: 'low' | 'medium' | 'high' | 'critical';
-  status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  status: 'open' | 'in_progress' | 'closed';
   likes: number;
   comments: number;
   shares: number;
@@ -16,6 +16,7 @@ export interface Report {
   created_at: string;
   updated_at: string;
   username: string;
+  location_text?: string;
 }
 
 export interface ApiResponse<T> {
@@ -87,6 +88,39 @@ export async function createReport(data: CreateReportData): Promise<Report | nul
     return result.data || null;
   } catch (error) {
     console.error('Error creating report:', error);
+    return null;
+  }
+}
+
+export interface UpdateReportData {
+  title?: string;
+  description?: string;
+  category?: 'Safety' | 'Event' | 'Note';
+  urgency?: 'Urgent' | 'Warning' | 'Non-urgent';
+  latitude?: number;
+  longitude?: number;
+  status?: 'open' | 'in_progress' | 'closed';
+}
+
+export async function updateReport(id: number, data: UpdateReportData): Promise<Report | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/reports/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result: ApiResponse<Report> = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Failed to update report');
+    }
+
+    return result.data || null;
+  } catch (error) {
+    console.error('Error updating report:', error);
     return null;
   }
 }
