@@ -119,6 +119,7 @@
 
 /*Tag color system */
 :root {
+  --usr-coord:      #3b82f6;
   /* Base accent (used for outlines, map pins, and solid buttons) */
   --tag-safety:    #f97316; /* orange-500 */
   --tag-event:     #14b8a6; /* teal-500   */
