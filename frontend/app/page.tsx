@@ -13,6 +13,7 @@ import { Plus, User } from 'lucide-react';
 import { type MapPin } from '@/components/map-background';
 import { TrendingSidebar, type TrendingPost } from '@/components/trending-sidebar';
 import { MapControls } from '@/components/map-controls';
+import { MapLegend } from '@/components/map-legend';
 import { fetchReports, type Report } from '@/lib/api';
 import { CreateReportModal } from '@/components/create-report-modal';
 // import { SearchBar } from "@/components/search-bar"; -- needs to be repurposed, updates underway
@@ -320,6 +321,9 @@ export default function Page() {
         onZoomOut={handleZoomOut}
         onCenter={handleCenter}
       />
+
+      {/* Map legend (bottom left) */}
+      <MapLegend />
 
       {/* Floating (+) create report button */}
       <button

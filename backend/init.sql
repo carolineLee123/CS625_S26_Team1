@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS reports (
     description TEXT NOT NULL,
     category ENUM('safety', 'event','note') NOT NULL,
     safety_level ENUM('low', 'medium', 'high', 'critical') NOT NULL,
-    status ENUM('open', 'in_progress', 'resolved', 'closed') DEFAULT 'open',
+    status ENUM('open', 'in_progress', 'closed') DEFAULT 'open',
     likes INT DEFAULT 0,
     comments INT DEFAULT 0,
     shares INT DEFAULT 0,

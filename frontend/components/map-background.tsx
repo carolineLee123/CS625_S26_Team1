@@ -158,8 +158,7 @@ export function MapBackground({
 
           const statusLabel = pin.status === 'open' ? 'Active'
             : pin.status === 'in_progress' ? 'In Progress'
-            : pin.status === 'resolved' ? 'Resolved'
-            : pin.status === 'closed' ? 'Inactive'
+            : pin.status === 'closed' ? 'Closed'
             : pin.status ?? ''
 
           let dateLabel = ''

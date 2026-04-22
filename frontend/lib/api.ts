@@ -8,7 +8,7 @@ export interface Report {
   description: string;
   category: 'safety' | 'event' | 'note' | 'weather' | 'infrastructure' | 'other';
   safety_level: 'low' | 'medium' | 'high' | 'critical';
-  status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  status: 'open' | 'in_progress' | 'closed';
   likes: number;
   comments: number;
   shares: number;
@@ -99,7 +99,7 @@ export interface UpdateReportData {
   urgency?: 'Urgent' | 'Warning' | 'Non-urgent';
   latitude?: number;
   longitude?: number;
-  status?: 'open' | 'in_progress' | 'resolved' | 'closed';
+  status?: 'open' | 'in_progress' | 'closed';
 }
 
 export async function updateReport(id: number, data: UpdateReportData): Promise<Report | null> {

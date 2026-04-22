@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { MapPin as MapPinIcon, Calendar, User, BadgeCheck, Heart, MessageCircle, Hash, Share2, MoreHorizontal, Pencil } from 'lucide-react';
 import {
   Dialog,
@@ -42,13 +43,34 @@ function getInitials(name?: string): string {
 }
 
 export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit }: ViewReportModalProps) {
+  const [verifiedReports, setVerifiedReports] = useState<Record<string, boolean>>({});
+  const [reportCounts, setReportCounts] = useState<Record<string, number>>({});
+
   if (!report) return null;
+
+  const reportId = report.id;
+  const isVerified = verifiedReports[reportId] ?? false;
+  const verifiedCount = reportCounts[reportId] ?? report.verifiedCount ?? 0;
 
   const urgencyTag = getUrgencyTag(report.category, report.safetyLevel);
   const categoryTag = getCategoryTag(report.category);
   const postedLabel = report.createdAt
     ? `Posted ${new Date(report.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
     : getTimeAgo(report.createdAt);
+
+  const handleVerifyClick = () => {
+    setVerifiedReports(prev => ({
+      ...prev,
+      [reportId]: !isVerified
+    }));
+
+    setReportCounts(prev => ({
+      ...prev,
+      [reportId]: isVerified
+        ? (prev[reportId] ?? report.verifiedCount ?? 0) - 1
+        : (prev[reportId] ?? report.verifiedCount ?? 0) + 1
+    }));
+  };
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
@@ -89,7 +111,7 @@ export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit
                 )}>
                   {report.status === 'open' ? 'Active'
                     : report.status === 'in_progress' ? 'In Progress'
-                    : report.status === 'resolved' ? 'Resolved'
+                    : report.status === 'closed' ? 'Closed'
                     : 'Inactive'}
                 </span>
               )}
@@ -132,9 +154,17 @@ export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit
                 <span className="flex items-center gap-1 font-semibold text-gray-700 text-sm">
                   <BadgeCheck size={12} /> Verified by
                 </span>
-                <span className="text-sm text-gray-500">
-                  {report.verifiedCount ?? 0} member{report.verifiedCount === 1 ? '' : 's'}
-                </span>
+                <button
+                  onClick={handleVerifyClick}
+                  className={cn(
+                    'text-sm text-left transition-all duration-200 rounded px-1.5 py-0.5 -ml-1.5',
+                    isVerified
+                      ? 'text-blue-600 font-semibold bg-blue-50 hover:bg-blue-100'
+                      : 'text-gray-500 hover:text-blue-600 hover:bg-blue-50'
+                  )}
+                >
+                  {verifiedCount} member{verifiedCount === 1 ? '' : 's'}
+                </button>
               </div>
             </div>
 
@@ -145,7 +175,17 @@ export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit
             <div className="flex items-center gap-5 pt-1 border-t border-gray-100 text-sm text-gray-400">
               <span className="flex items-center gap-1"><Heart size={12} /> {report.likes ?? 0}</span>
               <span className="flex items-center gap-1"><MessageCircle size={12} /> {report.comments ?? 0}</span>
-              <span className="flex items-center gap-1"><Hash size={12} />✓ {report.verifiedCount ?? 0}</span>
+              <button
+                onClick={handleVerifyClick}
+                className={cn(
+                  'flex items-center gap-1 transition-all duration-200 rounded px-1.5 py-0.5 -ml-1.5',
+                  isVerified
+                    ? 'text-blue-600 font-semibold hover:text-blue-700'
+                    : 'hover:text-blue-600'
+                )}
+              >
+                <Hash size={12} />✓ {verifiedCount}
+              </button>
               <span className="flex items-center gap-1 ml-auto"><Share2 size={12} /> {report.shares ?? 0}</span>
             </div>
           </div>
