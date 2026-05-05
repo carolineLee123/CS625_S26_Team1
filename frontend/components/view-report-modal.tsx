@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import {
   DropdownMenu,
@@ -45,6 +46,7 @@ function getInitials(name?: string): string {
 export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit }: ViewReportModalProps) {
   const [verifiedReports, setVerifiedReports] = useState<Record<string, boolean>>({});
   const [reportCounts, setReportCounts] = useState<Record<string, number>>({});
+  const [showVerifyInfo, setShowVerifyInfo] = useState(false);
 
   if (!report) return null;
 
@@ -59,20 +61,28 @@ export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit
     : getTimeAgo(report.createdAt);
 
   const handleVerifyClick = () => {
-    setVerifiedReports(prev => ({
-      ...prev,
-      [reportId]: !isVerified
-    }));
-
+    if (!isVerified) {
+      setShowVerifyInfo(true);
+      return;
+    }
+    setVerifiedReports(prev => ({ ...prev, [reportId]: false }));
     setReportCounts(prev => ({
       ...prev,
-      [reportId]: isVerified
-        ? (prev[reportId] ?? report.verifiedCount ?? 0) - 1
-        : (prev[reportId] ?? report.verifiedCount ?? 0) + 1
+      [reportId]: (prev[reportId] ?? report.verifiedCount ?? 0) - 1,
     }));
   };
 
+  const confirmVerify = () => {
+    setVerifiedReports(prev => ({ ...prev, [reportId]: true }));
+    setReportCounts(prev => ({
+      ...prev,
+      [reportId]: (prev[reportId] ?? report.verifiedCount ?? 0) + 1,
+    }));
+    setShowVerifyInfo(false);
+  };
+
   return (
+    <>
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto p-0 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
         {/* Edit button */}
@@ -194,5 +204,38 @@ export function ViewReportModal({ open, onClose, report, canEdit = false, onEdit
 
       </DialogContent>
     </Dialog>
+
+    <Dialog open={showVerifyInfo} onOpenChange={(o) => { if (!o) setShowVerifyInfo(false); }}>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <BadgeCheck size={18} className="text-blue-500" />
+            Community Verification
+          </DialogTitle>
+          <DialogDescription className="sr-only">About community verification</DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col gap-3 text-sm text-gray-600">
+          <p className="leading-relaxed">
+            Verification is a community-based moderation mechanism that lets members confirm a report's legitimacy.
+          </p>
+          <p className="leading-relaxed">
+            When you verify a report, you're signaling to others that the information is accurate and trustworthy. Reports with more verifications receive a higher credibility score and are surfaced more prominently in the sidebar.
+          </p>
+          <p className="text-xs text-blue-500 border-t border-gray-100 pt-2">
+            You can remove your verification at any time by clicking the #✓ button below again.
+          </p>
+        </div>
+        <div className="flex justify-end pt-2">
+          <button
+            type="button"
+            onClick={confirmVerify}
+            className="rounded-lg px-5 py-2 text-sm font-semibold bg-blue-500 text-white hover:bg-blue-600 active:scale-95 transition-all"
+          >
+            OK, verify this report
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

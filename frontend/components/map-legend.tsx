@@ -7,8 +7,8 @@ export function MapLegend() {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const legendItems = [
-    { label: 'Critical', color: '#ef4444', description: 'Urgent safety issues' },
-    { label: 'High Priority', color: '#eab308', description: 'Safety concerns' },
+    { label: 'Urgent Safety Alert', color: '#ef4444', description: 'Take immediate protective action' },
+    { label: 'Warning Safety Alert', color: '#eab308', description: 'Advised to take caution' },
     { label: 'Event', color: '#14b8a6', description: 'Community events' },
     { label: 'Note', color: '#6b7280', description: 'General updates' },
   ];
