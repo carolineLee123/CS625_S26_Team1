@@ -1,4 +1,4 @@
-export type TagColor = 'urgent' | 'warning' | 'nonurgent' | 'safety' | 'note' | 'event' | 'weather';
+export type TagColor = 'urgent' | 'warning' | 'nonurgent' | 'safety' | 'note' | 'event';
 
 export interface TagInfo {
   label: string;
@@ -10,7 +10,6 @@ export function getCategoryTag(category?: string): TagInfo {
   switch (category?.toLowerCase()) {
     case 'safety':  return { label: 'Safety',  cssClass: 'tag-safety',  color: 'safety' };
     case 'event':   return { label: 'Event',   cssClass: 'tag-event',   color: 'event' };
-    case 'weather': return { label: 'Weather', cssClass: 'tag-weather', color: 'weather' };
     default:        return { label: 'Note',    cssClass: 'tag-note',    color: 'note' };
   }
 }

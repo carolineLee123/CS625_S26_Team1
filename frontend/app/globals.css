@@ -127,7 +127,6 @@
   --tag-urgent:    #ef4444; /* red-500    */
   --tag-warning:   #eab308; /* yellow-500 */
   --tag-nonurgent: #6b7280; /* gray-500   */
-  --tag-weather:   #6b7280; /* gray-500   */
 
   /* Light variant (bg / text / border) */
   --tag-safety-bg:      #fff7ed; --tag-safety-fg:      #9a3412; --tag-safety-border:      #fdba74;
@@ -136,8 +135,12 @@
   --tag-urgent-bg:      #fee2e2; --tag-urgent-fg:      #b91c1c; --tag-urgent-border:      #fca5a5;
   --tag-warning-bg:     #fef9c3; --tag-warning-fg:     #92400e; --tag-warning-border:     #fde68a;
   --tag-nonurgent-bg:   #e1e2e4; --tag-nonurgent-fg:   #374151; --tag-nonurgent-border:   #d1d5db;
-  --tag-weather-bg:     #f3f4f6; --tag-weather-fg:     #374151; --tag-weather-border:     #d1d5db;
 }
+/*   --tag-weather: #6b7280; */
+  /* gray-500   */
+/* --tag-weather-bg: #f3f4f6;
+--tag-weather-fg: #374151;
+--tag-weather-border: #d1d5db;   */
 
 /* Light pill — card previews, map tooltip, sidebar badges */
 .tag-safety    { background-color: var(--tag-safety-bg);    color: var(--tag-safety-fg);    border: 1px solid var(--tag-safety-border); }
@@ -146,7 +149,7 @@
 .tag-urgent    { background-color: var(--tag-urgent-bg);    color: var(--tag-urgent-fg);    border: 1px solid var(--tag-urgent-border); }
 .tag-warning   { background-color: var(--tag-warning-bg);   color: var(--tag-warning-fg);   border: 1px solid var(--tag-warning-border); }
 .tag-nonurgent { background-color: var(--tag-nonurgent-bg); color: var(--tag-nonurgent-fg); border: 1px solid var(--tag-nonurgent-border); }
-.tag-weather   { background-color: var(--tag-weather-bg);   color: var(--tag-weather-fg);   border: 1px solid var(--tag-weather-border); }
+/* .tag-weather   { background-color: var(--tag-weather-bg);   color: var(--tag-weather-fg);   border: 1px solid var(--tag-weather-border); } */
 
 /* Solid pill — active/selected button state (base accent + white text) */
 .tag-solid-safety    { background-color: var(--tag-safety);    color: #fff; border: 1px solid var(--tag-safety); }
@@ -155,7 +158,7 @@
 .tag-solid-urgent    { background-color: var(--tag-urgent);    color: #fff; border: 1px solid var(--tag-urgent); }
 .tag-solid-warning   { background-color: var(--tag-warning);   color: #fff; border: 1px solid var(--tag-warning); }
 .tag-solid-nonurgent { background-color: var(--tag-nonurgent); color: #fff; border: 1px solid var(--tag-nonurgent); }
-.tag-solid-weather   { background-color: var(--tag-weather);   color: #fff; border: 1px solid var(--tag-weather); }
+/* .tag-solid-weather   { background-color: var(--tag-weather);   color: #fff; border: 1px solid var(--tag-weather); } */
 
 /* Outline pill — inactive/unselected button state */
 .tag-outline-safety    { color: var(--tag-safety);    border: 1px solid var(--tag-safety);    background: transparent; }
@@ -164,7 +167,7 @@
 .tag-outline-urgent    { color: var(--tag-urgent);    border: 1px solid var(--tag-urgent);    background: transparent; }
 .tag-outline-warning   { color: var(--tag-warning);   border: 1px solid var(--tag-warning);   background: transparent; }
 .tag-outline-nonurgent { color: var(--tag-nonurgent); border: 1px solid var(--tag-nonurgent); background: transparent; }
-.tag-outline-weather   { color: var(--tag-weather);   border: 1px solid var(--tag-weather);   background: transparent; }
+/* .tag-outline-weather   { color: var(--tag-weather);   border: 1px solid var(--tag-weather);   background: transparent; } */
 
 /* ── Status colors ────────────────────────────────────────────────────────── */
 :root {
