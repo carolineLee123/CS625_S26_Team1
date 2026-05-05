@@ -35,45 +35,81 @@ const STATUS_OPTIONS: {
   display: string;
   color: string;
   active: string;
+  blurb: string;
 }[] = [
   {
     label: "open",
     display: "Active",
     color: "border-gray-300 text-gray-600",
     active: "bg-gray-200 text-gray-800 border-gray-300",
+    blurb: "The issue is ongoing or unresolved",
   },
   {
     label: "in_progress",
     display: "In Progress",
     color: "border-blue-300 text-blue-600",
     active: "bg-blue-100 text-blue-700 border-blue-300",
+    blurb: "Someone is actively working on addressing this",
   },
   {
     label: "closed",
     display: "Closed",
     color: "border-green-300 text-green-600",
     active: "bg-green-100 text-green-700 border-green-300",
+    blurb: "The issue has been resolved",
   },
 ];
 
-const CATEGORIES: { label: Category; color: string; active: string }[] = [
-  { label: "Safety", color: "tag-outline-safety", active: "tag-solid-safety" },
-  { label: "Event", color: "tag-outline-event", active: "tag-solid-event" },
-  { label: "Note", color: "tag-outline-note", active: "tag-solid-note" },
+const CATEGORIES: {
+  label: Category;
+  color: string;
+  active: string;
+  blurb: string;
+}[] = [
+  {
+    label: "Safety",
+    color: "tag-outline-safety",
+    active: "tag-solid-safety",
+    blurb: "Hazards, incidents, or conditions that may affect wellbeing",
+  },
+  {
+    label: "Event",
+    color: "tag-outline-event",
+    active: "tag-solid-event",
+    blurb: "Community events, gatherings, or activities in your area",
+  },
+  {
+    label: "Note",
+    color: "tag-outline-note",
+    active: "tag-solid-note",
+    blurb: "General observations or updates for the community",
+  },
 ];
 
-const URGENCY_LEVELS: { label: Urgency; color: string; active: string }[] = [
+const URGENCY_LEVELS: {
+  label: Urgency;
+  color: string;
+  active: string;
+  blurb: string;
+}[] = [
   {
     label: "Non-urgent",
     color: "tag-outline-nonurgent",
     active: "tag-solid-nonurgent",
+    blurb: "Informational — no immediate action needed",
   },
   {
     label: "Warning",
     color: "tag-outline-warning",
     active: "tag-solid-warning",
+    blurb: "Take caution — situation may escalate or affect others",
   },
-  { label: "Urgent", color: "tag-outline-urgent", active: "tag-solid-urgent" },
+  {
+    label: "Urgent",
+    color: "tag-outline-urgent",
+    active: "tag-solid-urgent",
+    blurb: "Immediate action or awareness required",
+  },
 ];
 
 const TAG_COLORS = {
@@ -448,6 +484,11 @@ export function CreateReportModal({
                   </button>
                 ))}
               </div>
+              {status && (
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {STATUS_OPTIONS.find((s) => s.label === status)?.blurb}
+                </p>
+              )}
             </div>
 
             {/* Category */}
@@ -475,6 +516,11 @@ export function CreateReportModal({
                   </button>
                 ))}
               </div>
+              {category && (
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {CATEGORIES.find((c) => c.label === category)?.blurb}
+                </p>
+              )}
             </div>
 
             {/* Urgency Level — only for Safety */}
@@ -500,6 +546,11 @@ export function CreateReportModal({
                     </button>
                   ))}
                 </div>
+                {urgency && (
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {URGENCY_LEVELS.find((u) => u.label === urgency)?.blurb}
+                  </p>
+                )}
               </div>
             )}
 
