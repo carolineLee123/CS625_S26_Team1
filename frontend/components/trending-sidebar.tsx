@@ -14,6 +14,7 @@ import {
   List,
   Search,
   Clock,
+  SlidersHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -29,7 +30,7 @@ export interface TrendingPost {
   comments: number;
   shares: number;
   tag: string;
-  tagColor: "urgent" | "warning" | "nonurgent" | "safety" | "note" | "event" | "weather";
+  tagColor: "urgent" | "warning" | "nonurgent" | "safety" | "note" | "event";
   timeAgo: string;
 }
 
@@ -133,7 +134,6 @@ const TAG_COLORS: Record<string, string> = {
   safety:    "tag-safety",
   note:      "tag-note",
   event:     "tag-event",
-  weather:   "tag-weather",
 };
 
 function formatNumber(n: number): string {
@@ -163,8 +163,28 @@ export function TrendingSidebar({ open, onClose, activePost, onPostClick, posts 
   const [view, setView] = useState<"list" | "compact">("list");
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<"all" | TrendingPost["tagColor"]>("all");
 
-  const filtered = posts;
+  const normalizedQuery = query.trim().toLowerCase();
+
+  const filtered = posts.filter((post) => {
+    const matchesCategory =
+      selectedCategory === "all" ||
+      post.tagColor === selectedCategory ||
+      (selectedCategory === "safety" &&
+        ["urgent", "warning", "nonurgent"].includes(post.tagColor));
+  
+    const matchesQuery =
+      !normalizedQuery ||
+      post.content.toLowerCase().includes(normalizedQuery) ||
+      post.location.toLowerCase().includes(normalizedQuery) ||
+      post.username.toLowerCase().includes(normalizedQuery) ||
+      post.handle.toLowerCase().includes(normalizedQuery) ||
+      post.tag.toLowerCase().includes(normalizedQuery);
+  
+    return matchesCategory && matchesQuery;
+  });
 
   const suggestions = query
     ? SUGGESTIONS.filter((s) =>
@@ -187,6 +207,18 @@ export function TrendingSidebar({ open, onClose, activePost, onPostClick, posts 
     if (type === "trending") return <TrendingUp size={14} className="text-orange-500 shrink-0" />;
     return <Clock size={14} className="text-gray-500 shrink-0" />;
   };
+
+  const CATEGORY_FILTERS: Array<{
+    label: string;
+    value: "all" | TrendingPost["tagColor"];
+  }> = [
+    { label: "All reports", value: "all" },
+    { label: "Urgent", value: "urgent" },
+    { label: "Warning", value: "warning" },
+    { label: "Safety", value: "safety" },
+    { label: "Events", value: "event" },
+    { label: "Notes", value: "note" },
+  ];
 
   return (
     <>
@@ -211,55 +243,100 @@ export function TrendingSidebar({ open, onClose, activePost, onPostClick, posts 
         {/* Search bar in sidebar */}
         <div className="flex items-center justify-between px-4 pt-4 pb-3">
           <div className="flex-1 relative">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSubmit(query);
-              }}
-            >
-              <div
-                className={cn(
-                  "flex items-center gap-2 h-9 px-3 rounded-lg border transition-all duration-200",
-                  focused
-                    ? "border-blue-400 ring-1 ring-blue-200"
-                    : "border-gray-200 bg-gray-50"
-                )}
+            <div className="flex items-center gap-2">
+              <form
+                className="flex-1"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSubmit(query);
+                }}
               >
-                <Search
-                  size={14}
+                <div
                   className={cn(
-                    "shrink-0 transition-colors",
-                    focused ? "text-blue-500" : "text-gray-400"
+                    "flex items-center gap-2 h-9 px-3 rounded-lg border transition-all duration-200",
+                    focused
+                      ? "border-blue-400 ring-1 ring-blue-200"
+                      : "border-gray-200 bg-gray-50"
                   )}
-                  aria-hidden="true"
-                />
-                <input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onFocus={() => setFocused(true)}
-                  onBlur={() => setTimeout(() => setFocused(false), 150)}
-                  placeholder="Search..."
-                  className="flex-1 bg-transparent text-sm text-foreground placeholder:text-gray-400 outline-none"
-                  aria-label="Search locations or tags"
-                  autoComplete="off"
-                />
-                {query && (
-                  <button
-                    type="button"
-                    onClick={() => setQuery("")}
-                    className="text-gray-400 hover:text-gray-600 transition-colors"
-                    aria-label="Clear search"
-                  >
-                    <X size={12} />
-                  </button>
+                >
+                  <Search
+                    size={14}
+                    className={cn(
+                      "shrink-0 transition-colors",
+                      focused ? "text-blue-500" : "text-gray-400"
+                    )}
+                    aria-hidden="true"
+                  />
+
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onFocus={() => setFocused(true)}
+                    onBlur={() => setTimeout(() => setFocused(false), 150)}
+                    placeholder="Search..."
+                    className="flex-1 bg-transparent text-sm text-foreground placeholder:text-gray-400 outline-none"
+                    aria-label="Search locations or tags"
+                    autoComplete="off"
+                  />
+
+                  {query && (
+                    <button
+                      type="button"
+                      onClick={() => setQuery("")}
+                      className="text-gray-400 hover:text-gray-600 transition-colors"
+                      aria-label="Clear search"
+                    >
+                      <X size={12} />
+                    </button>
+                  )}
+                </div>
+              </form>
+
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setFilterOpen((current) => !current)}
+                  className={cn(
+                    "h-9 w-9 rounded-lg border transition-colors flex items-center justify-center",
+                    selectedCategory !== "all" || filterOpen
+                      ? "border-blue-300 bg-blue-50 text-blue-600"
+                      : "border-gray-200 bg-gray-50 text-gray-500 hover:text-gray-700"
+                  )}
+                  aria-label="Filter reports"
+                  aria-expanded={filterOpen}
+                >
+                  <SlidersHorizontal size={14} />
+                </button>
+
+                {filterOpen && (
+                  <div className="absolute right-0 top-full mt-1 w-40 rounded-lg border border-gray-200 bg-white shadow-md z-50 py-1">
+                    {CATEGORY_FILTERS.map((category) => (
+                      <button
+                        key={category.value}
+                        type="button"
+                        onClick={() => {
+                          setSelectedCategory(category.value);
+                          setFilterOpen(false);
+                        }}
+                        className={cn(
+                          "w-full text-left px-3 py-2 text-sm transition-colors",
+                          selectedCategory === category.value
+                            ? "bg-blue-50 text-blue-700 font-medium"
+                            : "text-gray-600 hover:bg-gray-50"
+                        )}
+                      >
+                        {category.label}
+                      </button>
+                    ))}
+                  </div>
                 )}
               </div>
-            </form>
+            </div>
 
             {showDropdown && (
               <div
-                className="absolute top-full mt-1 left-0 right-0 rounded-lg border border-gray-200 overflow-hidden py-1 bg-white shadow-md z-40"
+                className="absolute top-full mt-1 left-0 right-11 rounded-lg border border-gray-200 overflow-hidden py-1 bg-white shadow-md z-40"
                 role="listbox"
                 aria-label="Search suggestions"
               >
