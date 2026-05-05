@@ -19,6 +19,7 @@ import { CreateReportModal } from '@/components/create-report-modal';
 // import { SearchBar } from "@/components/search-bar"; -- needs to be repurposed, updates underway
 import { ViewReportModal } from '@/components/view-report-modal';
 import { getPrimaryTag } from '@/lib/tags';
+import { formatNominatimLocation } from '@/lib/location-format';
 
 
 
@@ -97,7 +98,11 @@ export default function Page() {
   const mapRef = useRef<L.Map | null>(null);
   const [pins, setPins] = useState<MapPin[]>([]);
   const [loading, setLoading] = useState(true);
-  const [clickedCoords, setClickedCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [clickedLocation, setClickedLocation] = useState<{
+    lat: number;
+    lng: number;
+    label: string;
+  } | null>(null);
   const [viewReportOpen, setViewReportOpen] = useState(false);
   const [selectedPin, setSelectedPin] = useState<MapPin | null>(null);
   const [editOpen, setEditOpen] = useState(false);
@@ -215,12 +220,31 @@ export default function Page() {
     );
   }, []);
 
+  const reverseGeocodeLocation = useCallback(async (lat: number, lng: number) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&lat=${lat}&lon=${lng}`
+      );
+  
+      if (!response.ok) {
+        throw new Error("Reverse geocoding request failed");
+      }
+  
+      const result = await response.json();
+  
+      return formatNominatimLocation(result);
+    } catch (error) {
+      console.error("Reverse geocoding failed:", error);
+      return "Location unavailable";
+    }
+  }, []);
+
   const handleSearchLocation = useCallback(async (query: string) => {
     if (!mapRef.current || !query.trim()) return null;
   
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`
+        `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&q=${encodeURIComponent(query)}&limit=1`
       );
   
       if (!response.ok) {
@@ -236,7 +260,7 @@ export default function Page() {
   
       const lat = parseFloat(results[0].lat);
       const lng = parseFloat(results[0].lon);
-      const label = results[0].display_name || query;
+      const label = formatNominatimLocation(results[0]);
   
       mapRef.current.flyTo([lat, lng], 15);
   
@@ -252,14 +276,16 @@ export default function Page() {
   }, [handleSearchLocation]);
 
   
-  const handleMapClick = useCallback((lat: number, lng: number) => {
-    setClickedCoords({ lat, lng });
+  const handleMapClick = useCallback(async (lat: number, lng: number) => {
+    const label = await reverseGeocodeLocation(lat, lng);
+  
+    setClickedLocation({ lat, lng, label });
     setCreateOpen(true);
-  }, []);
+  }, [reverseGeocodeLocation]);
 
   const handleCreateClose = useCallback(() => {
     setCreateOpen(false);
-    setClickedCoords(null);
+    setClickedLocation(null);
   }, []);
 
   const currentUsername = 'testuser';
@@ -340,8 +366,9 @@ export default function Page() {
         open={createOpen}
         onClose={handleCreateClose}
         onReportCreated={loadReports}
-        initialLatitude={clickedCoords?.lat}
-        initialLongitude={clickedCoords?.lng}
+        initialLatitude={clickedLocation?.lat}
+        initialLongitude={clickedLocation?.lng}
+        initialLocationText={clickedLocation?.label}
         onSearchLocation={handleSearchLocation}
       />
 
